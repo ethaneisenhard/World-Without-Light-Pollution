@@ -16,6 +16,7 @@ describe("matchSitePage", () => {
     expect(matchSitePage("/impacts")).toBe("impacts");
     expect(matchSitePage("/petition")).toBe("petition");
     expect(matchSitePage("/resources")).toBe("resources");
+    expect(matchSitePage("/maps")).toBe("maps");
     expect(matchSitePage("/missing")).toBeNull();
   });
 });

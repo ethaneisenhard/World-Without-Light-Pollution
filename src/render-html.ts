@@ -1,7 +1,9 @@
 import {
   SITE_BRAND,
   SITE_AUTH_NAV,
-  SITE_NAV,
+  SITE_FOOTER_GROUPS,
+  SITE_HEADER_NAV,
+  SITE_RESOURCES_NAV,
   isActiveNav,
   pageTitle,
   type SitePageId,
@@ -31,9 +33,9 @@ import {
   renderFooter,
   renderHeader,
   renderNavLink,
-  renderSiteLogo,
   renderThemeToggleButton,
 } from "@glassbox-studio/components";
+import { outlineIconSvgByName } from "@glassbox-studio/ui-icons/ssr";
 import analyticsIntegration from "../integrations/analytics.json" with { type: "json" };
 import consentIntegration from "../integrations/consent.json" with { type: "json" };
 export type RenderDraftOpts = {
@@ -77,41 +79,32 @@ function parseTitleAndBody(source: string): { title: string; body: string } {
 }
 
 function navHtml(page: SitePageId): string {
-  const pageLinks = SITE_NAV.map((item) =>
+  const linkClass = "text-sm max-md:block max-md:px-3 max-md:py-3 max-md:text-base";
+
+  const headerLinks = SITE_HEADER_NAV.map((item) =>
     renderNavLink({
       props: {
         href: item.path,
         current: isActiveNav(item, page) ? "on" : "off",
-        className:
-          "text-sm max-md:block max-md:px-3 max-md:py-3 max-md:text-base",
+        className: linkClass,
       },
       slots: { label: item.label },
     }),
   ).join("");
 
-  const authLinks = [
-    renderNavLink({
-      props: {
-        href: SITE_AUTH_NAV.members.path,
-        current: "off",
-        className:
-          "text-sm max-md:block max-md:px-3 max-md:py-3 max-md:text-base",
-      },
-      slots: { label: SITE_AUTH_NAV.members.label },
-    }),
-    renderNavLink({
-      props: {
-        href: SITE_AUTH_NAV.login.path,
-        current: "off",
-        className:
-          "text-sm max-md:block max-md:px-3 max-md:py-3 max-md:text-base",
-      },
-      slots: { label: SITE_AUTH_NAV.login.label },
-    }),
-  ].join("");
+  const resourceLinks = SITE_RESOURCES_NAV.map(
+    (item) =>
+      `<a href="${item.path}" class="block rounded-md px-3 py-2 text-sm font-medium text-ink-soft hover:bg-sand hover:text-ink ${isActiveNav(item, page) ? "text-ink" : ""}">${escapeHtml(item.label)}</a>`,
+  ).join("");
 
-  const links = pageLinks + authLinks;
+  const dropdown = `<details class="group/dd relative max-md:w-full"><summary class="flex cursor-pointer list-none items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-ink-soft hover:text-ink max-md:px-3 max-md:py-3 max-md:text-base [&::-webkit-details-marker]:hidden">Resources<span class="transition-transform group-open/dd:rotate-180" aria-hidden="true">${outlineIconSvgByName("chevron-down", "size-4 shrink-0")}</span></summary><div class="flex flex-col max-md:pl-3 md:absolute md:left-0 md:top-full md:z-30 md:mt-1 md:w-60 md:rounded-xl md:border md:border-line md:bg-paper-raised md:p-1.5 md:shadow-md">${resourceLinks}</div></details>`;
 
+  const signIn = renderNavLink({
+    props: { href: SITE_AUTH_NAV.login.path, current: "off", className: linkClass },
+    slots: { label: SITE_AUTH_NAV.login.label },
+  });
+
+  const links = headerLinks + dropdown + signIn;
   const themeToggle = renderThemeToggleButton();
 
   return renderHeader({
@@ -123,19 +116,30 @@ function navHtml(page: SitePageId): string {
       instanceId: "site-header",
     },
     slots: {
-      brand: renderSiteLogo({
-        props: {
-          href: "/",
-          className: "font-display text-xl tracking-tight md:text-2xl",
-          instanceId: "site-logo",
-          size: "sm",
-        },
-        slots: {
-          wordmark: SITE_BRAND.name,
-        },
-      }),
+      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="earth-spin inline-flex shrink-0 text-accent" aria-hidden="true">${outlineIconSvgByName("globe-alt", "size-7")}</span><span class="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">${escapeHtml(SITE_BRAND.name)}</span></a>`,
       nav: links,
       actions: themeToggle,
+    },
+  });
+}
+
+function footerHtml(): string {
+  const columns = SITE_FOOTER_GROUPS.map(
+    (group) =>
+      `<div class="flex flex-col gap-3"><div class="text-xs font-semibold uppercase tracking-wider text-ink-soft">${escapeHtml(group.title)}</div><ul class="flex flex-col gap-2">${group.items
+        .map(
+          (item) =>
+            `<li><a href="${item.path}" class="rounded-md px-2 py-1 text-sm font-medium text-ink-soft hover:text-ink">${escapeHtml(item.label)}</a></li>`,
+        )
+        .join("")}</ul></div>`,
+  ).join("");
+
+  return renderFooter({
+    props: { variant: "transparent", borderTop: "off", instanceId: "site-footer" },
+    slots: {
+      brand: `<span class="font-display text-base text-ink">${escapeHtml(SITE_BRAND.name)}</span><p class="mt-3 max-w-xs text-sm leading-relaxed text-ink-soft">${escapeHtml(SITE_BRAND.tagline)}</p>`,
+      columns,
+      bottom: "World Against Light Pollution · Cloudflare Workers",
     },
   });
 }
@@ -195,21 +199,7 @@ function shell(
     ${navHtml(page)}
     ${body}
     <section class="bg-sand" data-as-band="footer">
-    ${renderFooter({
-      props: {
-        variant: "transparent",
-        borderTop: "off",
-        instanceId: "site-footer",
-      },
-      slots: {
-        brand: `<span class="font-display text-base text-ink">${escapeHtml(SITE_BRAND.name)}</span><p class="mt-3 max-w-xs text-sm leading-relaxed text-ink-soft">${escapeHtml(SITE_BRAND.tagline)}</p>`,
-        columns: `<div class="flex flex-col gap-3"><div class="text-xs font-semibold uppercase tracking-wider text-ink-soft">Explore</div><ul class="flex flex-col gap-2">${SITE_NAV.map(
-          (item) =>
-            `<li><a href="${item.path}" class="rounded-md px-2 py-1 text-sm font-medium text-ink-soft hover:text-ink">${escapeHtml(item.label)}</a></li>`,
-        ).join("")}</ul></div>`,
-        bottom: "World Against Light Pollution · Cloudflare Workers",
-      },
-    })}
+    ${footerHtml()}
     </section>
     <script src="/as-hmr-bridge.js" defer></script>
     ${inspectorScript}

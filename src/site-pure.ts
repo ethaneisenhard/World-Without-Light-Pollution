@@ -4,6 +4,7 @@ export type SitePageId =
   | "lumens"
   | "impacts"
   | "petition"
+  | "maps"
   | "resources"
   | "about"
   | "contact";
@@ -24,20 +25,62 @@ export const SITE_BRAND: SiteBrand = {
   tagline: "Reclaim the night sky.",
 };
 
+/** Full page list — route matching, page titles, canonical sitemap. */
 export const SITE_NAV: SiteNavItem[] = [
   { id: "home", label: "Home", path: "/" },
   { id: "what-is-light-pollution", label: "The Problem", path: "/what-is-light-pollution" },
   { id: "lumens", label: "Lumens", path: "/lumens" },
   { id: "impacts", label: "Impacts", path: "/impacts" },
   { id: "petition", label: "Petition", path: "/petition" },
-  { id: "resources", label: "Resources", path: "/resources" },
+  { id: "maps", label: "Light pollution maps", path: "/maps" },
+  { id: "resources", label: "Advocacy toolkit", path: "/resources" },
   { id: "about", label: "About", path: "/about" },
   { id: "contact", label: "Contact", path: "/contact" },
 ];
 
-/** Auth-gated demo (not a content page id — link only). */
+/** Header nav — keep it short: The Problem · Petition · Resources ▾ · Sign in. */
+export const SITE_HEADER_NAV: SiteNavItem[] = [
+  { id: "what-is-light-pollution", label: "The Problem", path: "/what-is-light-pollution" },
+  { id: "petition", label: "Petition", path: "/petition" },
+];
+
+/** Resources dropdown items. */
+export const SITE_RESOURCES_NAV: SiteNavItem[] = [
+  { id: "lumens", label: "Lumen education", path: "/lumens" },
+  { id: "impacts", label: "Impacts", path: "/impacts" },
+  { id: "maps", label: "Light pollution maps", path: "/maps" },
+  { id: "resources", label: "Advocacy toolkit", path: "/resources" },
+];
+
+/** Footer link groups. */
+export const SITE_FOOTER_GROUPS: { title: string; items: SiteNavItem[] }[] = [
+  {
+    title: "Learn",
+    items: [
+      { id: "what-is-light-pollution", label: "The Problem", path: "/what-is-light-pollution" },
+      { id: "lumens", label: "Lumens", path: "/lumens" },
+      { id: "impacts", label: "Impacts", path: "/impacts" },
+    ],
+  },
+  {
+    title: "Take action",
+    items: [
+      { id: "petition", label: "Petition", path: "/petition" },
+      { id: "maps", label: "Light pollution maps", path: "/maps" },
+      { id: "resources", label: "Advocacy toolkit", path: "/resources" },
+    ],
+  },
+  {
+    title: "Movement",
+    items: [
+      { id: "about", label: "About", path: "/about" },
+      { id: "contact", label: "Contact", path: "/contact" },
+    ],
+  },
+];
+
+/** Auth links (community arrives later — header shows only "Sign in"). */
 export const SITE_AUTH_NAV = {
-  members: { label: "Members", path: "/members" },
   login: { label: "Sign in", path: "/login" },
   account: { label: "Account", path: "/account" },
 } as const;
@@ -52,6 +95,7 @@ export function matchSitePage(pathname: string): SitePageId | null {
     "/lumens": "lumens",
     "/impacts": "impacts",
     "/petition": "petition",
+    "/maps": "maps",
     "/resources": "resources",
   };
   return byPath[path] ?? null;

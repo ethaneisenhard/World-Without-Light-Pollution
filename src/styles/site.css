@@ -11,6 +11,26 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ── Earth logo + home hero (World Against Light Pollution) ── */
+@keyframes earth-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.earth-spin {
+  animation: earth-spin 26s linear infinite;
+}
+
+[data-as-instance="home-band"] {
+  background-color: var(--color-hero-from);
+  background-image: url("/hero-night-sky.svg");
+  background-size: cover;
+  background-position: center;
+  color: var(--color-on-hero);
+}
+.nl-hero-sub {
+  color: var(--color-on-hero-muted);
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

@@ -82,7 +82,7 @@ export function composeHomeHeroHtml(input: {
   slots.eyebrow = renderEyebrow({
     props: {
       align: "center",
-      color: "muted",
+      color: "brand",
       instanceId: "home-eyebrow",
     },
     slots: { text: SITE_BRAND.name },
@@ -93,7 +93,7 @@ export function composeHomeHeroHtml(input: {
       size: "display",
       align: "center",
       weight: "bold",
-      color: "ink",
+      color: "inherit",
       instanceId: "home-title",
     },
     slots: { text: markdownToInlineHtml(input.tagline || "Home") },
@@ -103,8 +103,8 @@ export function composeHomeHeroHtml(input: {
         props: {
           variant: "lead",
           align: "center",
-          color: "muted",
-          className: "max-w-xl",
+          color: "inherit",
+          className: "max-w-xl nl-hero-sub",
           instanceId: "home-subtitle",
         },
         slots: { content: markdownToInlineHtml(input.subtitle) },
@@ -126,7 +126,8 @@ export function composeHomeHeroHtml(input: {
     props: {
       variant: "secondary",
       href: "/lumens",
-      className: buttonClassName("secondary"),
+      className:
+        "inline-flex items-center rounded-full border border-on-hero/40 px-6 py-3 text-sm font-medium text-on-hero hover:border-on-hero/80 active:scale-[0.97] transition",
       instanceId: "home-cta-secondary",
     },
     slots: { label: "Learn about lumens" },
