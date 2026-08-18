@@ -1,0 +1,106 @@
+---
+description: Remix/Kody patterns for every UI — URL SoT, one-way paint, pending/optimistic; Kody worker/client shape. Always on.
+alwaysApply: true
+---
+
+# Remix patterns (always on)
+
+**Golden sentence:** Every product UI uses **Remix (Kent/Kody) patterns** — URL + loaders + navigation/form pending, XState only for non-URL chrome graphs. Never invent a second source of truth or heal state during paint.
+
+Applies to **Studio** (`apps/studio/`) and **ideal-stack** (`projects/*`). Canonical reference: [kentcdodds/kody](https://github.com/kentcdodds/kody) — Remix 3 on Cloudflare Workers, `remix/ui`, `remix/router`, esbuild client, `wrangler dev`.
+
+## Kody frontend shape (copy this)
+
+**Not** Vite React SPA. **Not** React Router v7 as primary ([ideal-stack.md](../../docs/architecture/ideal-stack.md)). Pin `remix@3.0.0-beta.5` until GA.
+
+```
+packages/worker/   # or apps/studio/, projects/<app>/
+  src/index.ts           → Worker entry (assets → API → router)
+  src/app/handler.ts     → createAppRouter + router.map(routes, actions)
+  src/app/handlers/*.ts  → server loaders/actions
+  client/entry.tsx       → remix/ui run()
+  client/app-root.tsx    → clientEntry + AppRoot
+  client/app.tsx         → Handle components (not useState clusters)
+  client/routes/         → route loaders + UI
+  public/                → esbuild bundle
+  wrangler.jsonc
+```
+
+| Do | Don't |
+| --- | --- |
+| Server data in handlers / loaders | `useEffect` + `fetch` on mount |
+| URL + client route loaders for nav state | 5+ coordinating `useState` |
+| `Handle` + `handle.update()` after machine subscribe; XState for UI state | Handle `let busy` / `let *Open` / ad-hoc streaming flags |
+| Pending + optimistic from Remix nav/form (or machine intent) | Silent wait / manual `busy` only |
+| `remix/router` + `router.map(routes, { actions })` | Custom router |
+| esbuild client + `wrangler dev` | Vite-only SPA for Studio shell |
+
+State, pending/optimistic, and XState live in `remix/ui-state.mdc`. Design tokens via `design/design-system.mdc`.
+
+## One-way data (non-negotiable)
+
+```
+URL / loader data  →  machine URL_SYNCED (if needed)  →  paint
+User intent        →  setParams / navigate / form      →  same path paints
+```
+
+| Do | Don't |
+| --- | --- |
+| Shareable UI state in **URL** (search params / path) | Hidden Handle/`let` as SoT for project, tab, scope, path |
+| Project select / scope / open windows from `params` | Machine + URL both claim truth and "sync" later |
+| Paint from URL (or optimistic intent) on first frame | Heal / `syncFromUrl` / fixups **inside** render |
+| Native `<select>` `value` only when matching `<option>` exists | Claim selected while options empty → browser shows first option |
+| Opaque pill face + native menu = **one** id (`key` + `selected`) — [opaque-select-pill-sync](../shell/opaque-select-pill-sync.mdc) | Face says Workflow, open menu checks Agent |
+
+## Remix first, then XState
+
+| Need | Pattern |
+| --- | --- |
+| Workspace, route, open tabs, shareable scope | **URL** + Remix navigate / `setParams` |
+| Server/registry lists | Handler + loader (or client route loader) |
+| Form / nav in flight | Remix navigation / submission pending |
+| Menu, drawer, streaming, multi-surface chrome | **XState** — still projects URL when shareable; pending in context |
+| First-paint Host prefs (AI defaults, shell theme, …) | **SSR boot payload** — see `ssr-no-flicker.mdc` |
+| Async list / ledger / inbox hydrate | **Loading face** until ready — see `ssr-no-flicker.mdc` |
+
+If a control is shareable or bookmarkable → **URL owns it**. Sticky overrides that clear the URL param (or are not sticky).
+
+**First-paint flicker ban:** harness/model, shell theme, color mode, and every new "paints on frame one" pref → `ssr-no-flicker.mdc` · ADR 0015.
+**Content flash ban:** empty-hello / "No chats" / "Inbox empty" before hydrate ready → `ssr-no-flicker.mdc`.
+
+## Pending is mandatory when slow or mutating
+
+Silent wait = fail. If options load, workspace switch, or stream can lag:
+
+| Paint | How |
+| --- | --- |
+| **Optimistic** | Show intended value from click / `formData` / machine intent immediately |
+| **Pending** | Disabled control, pending face, or `pending*` in machine context |
+| **Never** | Fake "Global" / empty / previous workspace as truth while intent is a project |
+
+## Forbidden (chat-scope class bugs)
+
+- Dual SoT: URL says `?project=x`, picker/machine says Global
+- `setParams` ↔ navigate ↔ `handle.update` loops (storm / max call stack)
+- Side-effect "align to URL" calls during JSX paint
+- Skipping pending because "it should be fast"
+- Ad-hoc `busy` / coordinating booleans outside Remix nav or XState context
+
+## Agent checklist (every UI change)
+
+- [ ] Shareable state → URL (or documented ephemeral-only)
+- [ ] Paint path is one-way; no heal-in-render
+- [ ] Mutating / slow path has pending (and optimistic when safe)
+- [ ] `<select>` / lists: option exists before asserting selected
+- [ ] Opaque composer/chrome pills → `shell/opaque-select-pill-sync.mdc` (`key` + `selected` + one id)
+- [ ] Layout matches Kody worker/client split (not standalone CRA/Vite app)
+- [ ] First-paint Host/config prefs → `ssr-no-flicker.mdc` (no flash-heal)
+- [ ] Async hydrate lists/panes → `ssr-no-flicker.mdc` (loading, not empty lie; SSR when known)
+
+## Related
+
+- `remix/ui-state.mdc` — state ladder + XState + pending/optimistic
+- `remix/ssr-no-flicker.mdc` — no client flicker / no empty lie
+- `shell/opaque-select-pill-sync.mdc` — opaque pill face ↔ native `<select>` must not desync
+- `docs/architecture/ideal-stack.md` · `docs/design/ui-shell-layout.md`
+- [kentcdodds/kody](https://github.com/kentcdodds/kody)

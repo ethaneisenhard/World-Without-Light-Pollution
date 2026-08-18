@@ -1,0 +1,169 @@
+---
+description: Build the Glass Box way — pure + registry + orchestrator; no one-offs; DRY; UI↔MCP↔CLI parity. Always on.
+alwaysApply: true
+---
+
+# Build patterns (always on)
+
+**Golden sentence:** New behavior is a **pure** transform + a **registry** row (when N ≥ 2 kinds) + an **orchestrator** with injected `deps`, called by thin UI / HTTP / MCP / CLI adapters. Never `if (projectId === …)` / `if (provider === …)` / `if (harness === …)` business logic in hosts, and never a UI-only verb an agent can't reach.
+
+Pairs with `architecture/harness-shell-fidelity.mdc` (peers own loops; Studio is the shell) and `architecture/code-structure.mdc` (when to split the result).
+
+## Layers — who owns what
+
+| Layer | Owns | Never |
+| --- | --- | --- |
+| `*-pure.ts` / `*-logic.ts` | Transforms, validation, projections, ranking | `fetch`, `fs`, `document`, env reads |
+| `*-registry-pure.ts` | Id → implementation / policy row | Business I/O; host-only switches |
+| `*-orchestrator.ts` | Sequence pure + registry + injected deps | Business rules inline; hard-coded I/O |
+| `*-connector.ts` / `*-mount.ts` / handlers / MCP / CLI | Wire orchestrator to HTTP/DOM/XState/MCP/CLI | Duplicate logic from pure / orchestrator |
+
+```typescript
+// ✅ orchestrator — deps injected, pure core testable
+export async function loadProjectFilesOrchestrator(
+  deps: { listFiles: typeof listProjectFiles },
+  input: { root: string; subPath: string },
+) {
+  return deps.listFiles(input.root, input.subPath);
+}
+
+// ✅ test — text/oracle, no server
+const files = await loadProjectFilesOrchestrator(
+  { listFiles: async () => [{ name: "a.mdx", path: "content/a.mdx", type: "file" }] },
+  { root: "/tmp", subPath: "content" },
+);
+```
+
+## Registries (when N ≥ 2 kinds)
+
+```typescript
+// ✅ registry lookup — add a row, not a host branch
+export const MEMORY_IMPORT_PROJECTORS = { hermes: {…}, letta: {…} } as const;
+export function getMemoryImportProjector(id: string) { … }
+
+// ❌ one-off in handler
+if (provider === "hermes") { … } else if (provider === "letta") { … }
+```
+
+Same pattern: harness vision modes, tool catalogs, canvas window kinds, providers.
+
+## Pure branching — `switch` over `if` chains
+
+In `*-pure.ts` / `*-logic.ts`, branch on a **discriminant** (kind, status, phase, mode, enum, union tag, finite string id) with **`switch`** — never `if` / `else if` chains on that value.
+
+| Use | Form |
+| --- | --- |
+| Discriminant / finite tag | `switch (kind) { case …: … default: … }` |
+| Exhaustive TS union | `default: { const _x: never = kind; return _x }` |
+| Early guard / predicate | `if (!x) return …` / `if (a && b)` — **OK** (not a discriminant chain) |
+| N ≥ 2 kinds → behavior map | Prefer **registry** (`*-registry-pure`) over a long `switch` body |
+
+```typescript
+// ✅ discriminant → switch
+switch (phase) {
+  case "unbound":
+  case "loading":
+    return "pending";
+  case "ready":
+    return empty ? "empty" : "log";
+  case "error":
+    return "error";
+  default: {
+    const _exhaustive: never = phase;
+    return _exhaustive;
+  }
+}
+
+// ❌ same discriminant as if/else if
+if (phase === "unbound" || phase === "loading") return "pending";
+else if (phase === "ready") return empty ? "empty" : "log";
+else if (phase === "error") return "error";
+
+// ✅ guard stays if
+if (!input) return null;
+if (typeof raw !== "string") return "system";
+```
+
+**Scope:** new pure code + any pure file you touch — convert discriminant chains to `switch` in the same PR. Do not leave `else if (kind === …)` in pure modules you edit.
+
+## No one-offs
+
+**Golden sentence:** New behavior is a **registry row** or **config map** + **pure** transform + **orchestrator** (deps) + thin adapter.
+
+| Smell | Fail if | Do instead |
+| --- | --- | --- |
+| **Project-id branch** | `if (projectId === 'demo-blog')` in engine/shell | `project.json` maps / kind registries |
+| **Provider / peer branch in host** | `if (provider === 'hermes')` in HTTP/MCP/CLI | `*-registry-pure` projector map + lookup |
+| **Logic in the adapter** | Retrieve / forge / import rules inside `handlers/*` or `mcp-orchestrator` cases | `*-orchestrator.ts` with injected `deps`; adapter only parses I/O |
+
+**UI ↔ CLI ↔ MCP parity:** same orchestrator. Third copy of a rule = extract.
+
+### Config / map SoT (projects)
+
+| Need | Source of truth |
+| --- | --- |
+| Nav sections + Live URL map | `project.json` → `nav` + `route` |
+| Hosting preview origin | `project.json` → `hosting.prod_url` |
+| Behavior from inputs | `@glassbox-studio/studio-core` pure + registries |
+
+## DRY & extensibility (other operators)
+
+**Golden sentences:**
+
+1. **DRY** — one source of truth per concern; UI and CLI call the same API / pure path.
+2. **Abstract for the next user** — defaults are opinionated; behavior is swappable via config, registry, layout, or plugin — not a hard-coded single-operator tree.
+3. **Changeable up and down the stack** — tokens → chrome layout → panels → harness → headless API; each layer has a declared seam.
+
+| Do | Don't |
+| --- | --- |
+| Shared pure + API; thin UI/CLI adapters | Copy business rules into `app.tsx` **and** a CLI script |
+| Declarative maps (`project.json`, left-rail layout, plugin contrib) | Paste the same branch in three hosts |
+| Extract when a second caller appears | "Just one more" duplicate "for speed" |
+
+Assume someone else will reorder the left rail, add non-demo projects, or run headless. Declare the seam at **each** layer you touch (tokens, chrome layout, project config, API/CLI, harness/tools). If the answer is "only by editing our private fork," stop and add a seam. Detail: `docs/architecture/studio-plugins.md`.
+
+## UI ↔ MCP ↔ CLI parity (ship bar)
+
+**Golden sentence:** If a human can do it in Studio UI, an agent can do it via **MCP catalog** (and therefore CLI + Voice). No UI-only product verbs.
+
+Audience: **Studio Host / chrome / DeskPane apps** (`apps/studio`, `packages/studio/*`, Voice). Ideal-stack Live pages follow HTTP/loaders — not this catalog.
+
+ADR: [0012](../../docs/adr/0012-section-provider-tools.md). Gate: `app-tools-face-pure.ts`.
+
+```
+UI click  →  same orchestrator  →  MCP tool id  →  CLI `studio mcp <id>`  →  Voice/Chat job
+```
+
+| Face | Required | Fail if |
+| --- | --- | --- |
+| **Panel** | DeskPane / settings / chrome | Feature only in a Handle with no Host path |
+| **HTTP** | Handler on the orchestrator | UI `fetch` that MCP cannot call |
+| **MCP** | Row in `tool-catalog-pure.ts` | Open-only (`studio.nav`) for a new app's **job** |
+| **CLI** | `studio mcp <action>` (named subcommand optional) | UI-only side door |
+| **Voice / Chat** | Dispatch that catalog id | Voice-only tool that UI/MCP lack |
+
+`studio.nav` opens/focuses windows — it does **not** replace domain verbs (`messages.send`, `notes.write`, `calendar.create`, …). Named CLI is optional (`studio chat`, `studio sheets`); `studio mcp` is enough to ship.
+
+**Allowed non-catalog** (agents use files / `shell.run` / `studio.nav` / `studio.home.patch` instead): CodeMirror caret / xterm keystrokes, DeskPane drag-resize by pixels, true DOM scratch (focus ring, timer ids).
+
+## Agent checklist (every AI / domain / UI edit)
+
+- [ ] New behavior has a pure function (or extends one) before glue code
+- [ ] Multiple kinds/providers → **registry** row, not host `if`
+- [ ] Pure discriminant branches use **`switch`**; guards stay `if`
+- [ ] Orchestrator accepts `deps` / `options` — not hard-coded imports of I/O
+- [ ] HTTP, MCP, and CLI (when product-facing) call the **same** orchestrator
+- [ ] New mutating / multi-step path → `*-orchestrator.ts` with `deps`
+- [ ] Vitest (or terminal oracle) covers pure + orchestrator (+ registry lookup) paths
+- [ ] No `if (projectId|provider|harnessId === '…')` for **behavior** in hosts
+- [ ] Catalog id in `tool-catalog-pure.ts` (+ schema) for every new UI verb
+- [ ] Canvas window → `APP_TOOLS_FACE` prefixes (no new `open-only` debt)
+- [ ] Gate green: `vitest run app-tools-face-pure`
+
+## Related
+
+- `architecture/semantic-html-css.mdc` — markup/layout laws
+- `architecture/code-structure.mdc` — module size / folder hygiene (when to split)
+- `architecture/harness-shell-fidelity.mdc` — peers own loops; Studio = shell
+- `docs/architecture/studio-plugins.md` — customization levels + CLI parity
+- ADR [0012](../../docs/adr/0012-section-provider-tools.md) — app triple

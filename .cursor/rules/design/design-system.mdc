@@ -1,0 +1,145 @@
+---
+description: Studio chrome — tokens/primitives + Tailwind-only (no BEM); project Tailwind @theme + optional inherit. Design canvas (not 4th window).
+alwaysApply: true
+---
+
+# Design system (always on)
+
+**Studio chrome** uses shared tokens/primitives **and Tailwind utility classes**. **Project apps** use per-project Tailwind `@theme` (optional inherit from Studio / package). See `docs/design/ui-primitives.md` § Project design system (locked).
+
+## Packages (use these)
+
+| Package | Role |
+| --- | --- |
+| `@glassbox-studio/ui-tokens` | `toCssVars`, `themeStyleBlock`, design-system → `@theme` |
+| `@glassbox-studio/studio-theme-default` | Default Studio chrome `tokens.json` |
+| `@glassbox-studio/ui-icons` | Heroicons (remix/ui SVG factories) — see `components.mdc` |
+| `@glassbox-studio/ui-primitives` | Studio chrome atoms — typed class maps + remix/ui factories (ADR 0009) |
+| `@glassbox-studio/ui-components` | Studio chrome composed blocks (e.g. EmptyPanel) |
+| `@glassbox-studio/ui-layouts` | Studio shell zones / layout class maps (body / panels) |
+| `@glassbox-studio/components` | Ideal-stack Live registry (section → container → …) |
+
+**Ladder (Studio chrome):** `tokens → primitives → ui-components → ui-layouts`. No ghost packages — create only with a Studio import. Live registry stays `@glassbox-studio/components`. See ADR [0009](../../docs/adr/0009-ui-stack-packages.md) · `.scratch/ui-stack/`.
+
+**Do not advertise** `ui-patterns` / `ui-shell` — those names are retired.
+
+## Studio chrome styling (Tailwind only)
+
+**Golden sentence:** Studio UI paint + layout live in Tailwind utilities — prefer `@glassbox-studio/ui-*` typed exports; leftover constants in `apps/studio/client/studio-ui-*.ts` shrink via extraction. **Never** `!important`. Custom CSS is debt — shrink it; do not grow it.
+
+| Do | Don't |
+| --- | --- |
+| Add / extend `ui-primitives` / `ui-components` / `ui-layouts` (or shrink megasheet into them) | Invent BEM (`.as-foo__bar`, `.studio-panel__title`) |
+| New chrome domain → package export + Studio import same PR | Grow megasheets when a package export should own it |
+| Use theme-mapped utilities (`bg-surface`, `text-on-surface`, `border-border-bui`, `text-brand-600`, …) | Hand-roll layout/type/color in `studio.css` / `compact-shell.css` |
+| Hook JS with `data-as-*` / `data-studio-*` attrs | Style via class names that only exist in `studio.css` |
+| Container queries via Tailwind `@max-[…]` / `@[…]` when the pane is a container | CSS `@container` + `display: … !important` show/hide |
+| Dual-mount + Tailwind `hidden` / `flex` | Compact FOUC sheets fighting Tailwind with `!important` |
+
+### Forbidden
+
+| Never | Why |
+| --- | --- |
+| New `!important` in `apps/studio/client/styles/**` | Specificity wars; Tailwind can’t win cleanly |
+| New DeskPane / `#studio-wm-host` layout overrides in CSS | Fill = `wm.maximize` + host band tokens — see `shell/chrome-css.mdc` |
+| New compact “attribute graph” layout in CSS | Shell bands + dual faces are Tailwind |
+
+### When custom CSS is allowed (super rare — tokens / vendor only)
+
+| Keep custom CSS for | Why |
+| --- | --- |
+| `:root` safe-area / dock **token definitions** (`--as-safe-*`, `--as-mobile-dock-*`) | `env()` once; utilities consume vars |
+| 3rd-party token bridges (FullCalendar `.fc-*`, ProseMirror, Shiki overlay) | Nested vendor selectors we don’t own |
+| True micro-interaction / keyframes (`.as-press`, `.as-pane-enter`) | `:active` / `@keyframes` |
+
+If unsure: **Tailwind**. Only touch `studio.css` / `compact-shell.css` to **delete** debt or define a token — never to win a layout fight.
+
+## Rules
+
+| Do | Don't |
+| --- | --- |
+| Studio chrome: inject `--as-*` from theme tokens | Hardcode `#0f1115` / inline palette in Studio chrome |
+| Projects: Tailwind `@theme` as the design system | Invent a forever parallel project token language |
+| Opt-in inherit via `design.json` (`inherit: studio` or package) | Force every project to use Studio chrome theme |
+| Design canvas = token atlas + components (not a 4th window) | Add a separate “Design System” window |
+| Import primitives for chrome controls | Copy BrowserUI / shadcn buttons into `apps/studio` |
+| Boolean prefs → **`studioSwitch`** (iOS pill) from `@glassbox-studio/ui-primitives` | On/Off text buttons, checkbox-as-toggle, or a second switch look |
+| **Tabs / section chips stay at the top** of the pane (canvas strip, settings rail, in-window section tabs) | Bottom “pseudo-tabs” or window-launch chips that look like a second tab bar under content |
+
+**Golden sentence (Studio chrome):** Window switchers and section tabs live **above** scrollable body — never a dock of tab-like buttons under the list.
+
+**Icons:** Heroicons only — see `components.mdc` / `@glassbox-studio/ui-icons`.
+
+## PWA / safe-area (notch + dock)
+
+**Golden sentence:** Topbar pads for the notch. Mobile dock = thumb tab row only (same in browser + PWA). Never pad the dock for home-indicator.
+
+| Token | Source | Use |
+| --- | --- | --- |
+| `--as-safe-top` (etc.) | `env(safe-area-inset-*)` on `:root` | **Topbar notch pad only** |
+| `--as-mobile-dock-height` | `56px` | Tab row (icon + label) |
+| `--as-mobile-dock-offset` | `= --as-mobile-dock-height` | Sheet / `#studio-wm-host` clearance — on `:root`. No bottom safe-area. |
+
+**Single owner for token defs:** `apps/studio/client/styles/pwa-safe-area.css` (`:root` only). Compact **layout** → Tailwind shell classes + DeskPane maximize — not new `compact-shell.css` rules (`shell/chrome-css.mdc`).
+
+| Edge | Always |
+| --- | --- |
+| Topbar | pad with `SAFE_*` / `var(--as-safe-top)` (no `!important`) |
+| Bottom dock | Tab row only — **never** home-indicator / `pb-safe` / `--as-safe-bottom*` on the dock |
+| Sheets / wm-host | host height `calc(100dvh − top − dock-offset)`; offset collapses while chat input focused |
+
+**Utilities:** `SAFE_PT`, `SAFE_PB`, `SAFE_PL`, `SAFE_PR`, `SAFE_PT_TOPBAR` in `studio-ui-classes.ts`.
+
+## Boot (Studio chrome)
+
+```typescript
+import tokens from "@glassbox-studio/studio-theme-default/tokens.json";
+import { themeStyleBlock } from "@glassbox-studio/ui-tokens";
+// inject :root { --as-color-* }
+```
+
+## Checklist (Studio UI change)
+
+- [ ] Classes are Tailwind utilities or `studio-ui-classes.ts` constants — not new BEM
+- [ ] **No new `!important`** anywhere in Studio styles
+- [ ] No new layout/type/color in `studio.css` / `compact-shell.css` (delete debt only)
+- [ ] Colors use `--as-*` / mapped utilities — not raw hex
+- [ ] Tabs / section chips stay above scrollable body
+- [ ] Underline tabs use reserved indicator (`TAB_UNDERLINE` / transparent idle) — no layout shift; section strips leave ≥12px air below (`SECTION_TABS`)
+- [ ] Bordered peer sections use ≥ `gap-2` / `GAP_SECTION` (never kiss) — `surfaces.mdc`
+- [ ] No elevation box-shadows on cards/menus — border + surface ladder — `surfaces.mdc`
+- [ ] Rounded shells / Settings groups: inset ≥ radius; no flush Save — `surfaces.mdc`
+- [ ] Rounded table/directory pager uses body gutter `px-*` (clears corner arc) — `components.mdc`
+- [ ] Drawers/sheets: header X only — no top grabber — `components.mdc`
+- [ ] Create-new forms start collapsed — `components.mdc`
+- [ ] Interactive `input` / `textarea` / `select` ≥ `text-[16px]` — `components.mdc`
+- [ ] Boolean chrome prefs use `studioSwitch` (iOS pill) — not On/Off text
+- [ ] Fixed edge chrome uses `--as-safe-*` / `SAFE_*` (notch + home indicator OK in PWA)
+- [ ] DeskPane / compact / chat fill follows `shell/chrome-css.mdc`
+- [ ] Document-flow — general G1–G10; Studio chrome also S1–S5 — `natural-document-flow.mdc`
+- [ ] Content panes = flex-col; grid only as outer shell — `layout.mdc`
+
+## Docs
+
+`docs/design/ui-primitives.md` · `docs/design/ui-shell-layout.md` · `docs/architecture/studio-plugins.md` · grill #7–8 in `docs/product/mvp-checklist.md`
+
+Audit before ship: Studio chrome uses primitives + Tailwind + `--as-*`; projects use Tailwind `@theme` (optional inherit).
+
+## Related
+
+- `tokens-and-markup.mdc` — ideal-stack semantic HTML, Tailwind-first, `data-as-*`
+- `layout.mdc` — section → container → content; bordered filled surfaces
+- `components.mdc` — slots / Inspect tree / Tailwind on components
+- `tokens-and-markup.mdc` — project `@theme` vocabulary; no raw hex
+- `surfaces.mdc` — ink + hairline follow surface hue
+- `components.mdc` — underline tabs reserve space (no layout shift); section strips leave air below content
+- `surfaces.mdc` — bordered peer sections ≥8px gap
+- `surfaces.mdc` — no elevation box-shadows; menus/cards flat
+- `surfaces.mdc` — rounded shells inset ≥ radius; no nested-radius clash
+- `components.mdc` — drawers/sheets: X close only, no top grabber
+- `components.mdc` — create-new forms collapsed until Create new
+- `components.mdc` — interactive fields ≥16px (no Safari focus zoom)
+- `natural-document-flow.mdc` — general CSS/Tailwind (G1–G10) + Studio policy S1–S5 (ADR 0007)
+- `shell/chrome-css.mdc` — **no `!important`**; DeskPane/compact Tailwind-only
+- `studio-windows.mdc` — pane container queries (prefer Tailwind `@max-[…]` on chrome)
+- `docs/design/canvas-inspector.md` · `docs/adr/0002-canvas-inspector.md`

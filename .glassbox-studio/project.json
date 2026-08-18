@@ -1,0 +1,179 @@
+{
+  "id": "world-against-light-pollution",
+  "name": "World Against Light Pollution",
+  "mode": "native",
+  "purpose": "marketing-site",
+  "nav": {
+    "website": {
+      "path": "content",
+      "children": {
+        "pages": {
+          "path": "pages",
+          "kind": "pages",
+          "route": {
+            "pattern": "/:slug",
+            "index": "home",
+            "indexUrl": "/"
+          }
+        }
+      }
+    },
+    "design": {
+      "path": "design",
+      "route": {
+        "pattern": "/__as/design",
+        "indexUrl": "/__as/design"
+      },
+      "children": {
+        "components": {
+          "path": "components",
+          "kind": "components",
+          "route": {
+            "pattern": "/__as/design/components/:slug",
+            "indexUrl": "/__as/design/components"
+          }
+        },
+        "design_system": {
+          "path": "design-system.json",
+          "kind": "design-system",
+          "route": {
+            "pattern": "/__as/design/system",
+            "indexUrl": "/__as/design/system"
+          }
+        }
+      }
+    },
+    "data": {
+      "path": ".",
+      "children": {
+        "sources": {
+          "path": "data-sources",
+          "kind": "files"
+        },
+        "destinations": {
+          "path": "data-destinations",
+          "kind": "files"
+        }
+      }
+    },
+    "integrations": {
+      "path": "integrations",
+      "kind": "files"
+    },
+    "email": {
+      "path": "email",
+      "kind": "files"
+    },
+    "analytics": {
+      "path": "integrations",
+      "children": {
+        "config": {
+          "path": "analytics.json",
+          "kind": "files"
+        }
+      }
+    },
+    "media_library": {
+      "path": "media",
+      "kind": "media"
+    },
+    "app": {
+      "path": "src",
+      "kind": "files"
+    },
+    "assets": {
+      "path": "public",
+      "kind": "files"
+    }
+  },
+  "storage": {
+    "records": "primary-d1",
+    "forms": "primary-d1",
+    "media": "cdn-r2",
+    "analytics": "primary-d1",
+    "mail": "mail-send"
+  },
+  "providers": {
+    "media": {
+      "plugin": "@glassbox-studio/media-r2"
+    },
+    "calendar": {
+      "plugin": "@glassbox-studio/calendar-ledger"
+    },
+    "records": {
+      "plugin": "@glassbox-studio/records-sqlite"
+    },
+    "forms": {
+      "plugin": "@glassbox-studio/forms-d1"
+    },
+    "email": {
+      "plugin": "@glassbox-studio/email-cloudflare"
+    },
+    "analytics": {
+      "plugin": "@glassbox-studio/analytics-d1"
+    },
+    "integrations": {
+      "plugin": "n8n-local",
+      "registry": "integrations/automation.json"
+    }
+  },
+  "hosting": {
+    "provider": "cloudflare",
+    "prod_url": "http://127.0.0.1:9889",
+    "config_path": "wrangler.jsonc",
+    "hmr": {
+      "bridge": "/as-hmr-bridge.js",
+      "protocol": "vite-full-reload/1",
+      "viteClient": "http://127.0.0.1:5194/as-preview-client.js"
+    },
+    "content_generate": {
+      "command": "node",
+      "args": [
+        "scripts/generate-pages.mjs"
+      ]
+    }
+  },
+  "canvasInspector": {
+    "stripAttrs": true
+  },
+  "dev": {
+    "defaultProfile": "minimal",
+    "port": 9889,
+    "servers": [
+      {
+        "id": "web-node",
+        "label": "Web (Node lite)",
+        "kind": "web",
+        "port": 9889,
+        "url": "http://127.0.0.1:9889",
+        "runtime": "node",
+        "command": "pnpm",
+        "args": [
+          "exec",
+          "tsx",
+          "watch",
+          "--clear-screen=false",
+          "scripts/preview-node.ts"
+        ],
+        "profiles": [
+          "minimal"
+        ]
+      },
+      {
+        "id": "web-wrangler",
+        "label": "Web (Wrangler + content HMR)",
+        "kind": "web",
+        "port": 8789,
+        "url": "http://127.0.0.1:8789",
+        "runtime": "wrangler",
+        "command": "pnpm",
+        "args": [
+          "dev:all"
+        ],
+        "profiles": [
+          "full"
+        ]
+      }
+    ]
+  }
+}

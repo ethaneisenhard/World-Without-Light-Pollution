@@ -1,0 +1,87 @@
+{
+  "version": 1,
+  "columns": [
+    {
+      "id": "backlog",
+      "title": "Backlog",
+      "order": 0
+    },
+    {
+      "id": "ready",
+      "title": "Ready",
+      "order": 1
+    },
+    {
+      "id": "doing",
+      "title": "Doing",
+      "order": 2
+    },
+    {
+      "id": "done",
+      "title": "Done",
+      "order": 3
+    }
+  ],
+  "cards": [
+    {
+      "id": "card_starter_inspect_stamps",
+      "title": "Design atlas / Inspect stamps sanity",
+      "body": "Confirm section → container → blog-hero + slot stamps on Live + Design sandbox.",
+      "columnId": "ready",
+      "order": 0,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_inspect_stamps.md"
+    },
+    {
+      "id": "card_starter_forms_email",
+      "title": "Forms / email integrations smoke note",
+      "body": "Document contact form + email destination smoke path for demos.",
+      "columnId": "ready",
+      "order": 1,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_forms_email.md"
+    },
+    {
+      "id": "card_starter_about_contact",
+      "title": "About / Contact page copy pass",
+      "body": "Replace placeholder titles; keep prose short and Northline-voiced.",
+      "columnId": "doing",
+      "order": 0,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_about_contact.md"
+    },
+    {
+      "id": "card_starter_home_hero",
+      "title": "Home hero polish",
+      "body": "Brand-first Northline: one headline, one supporting line, CTA group; tokens only.",
+      "columnId": "done",
+      "order": 0,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_home_hero.md"
+    },
+    {
+      "id": "card_starter_auth_readme",
+      "title": "AUTH.md linked from README",
+      "body": "Demo path points at auth prove-it steps for members area.",
+      "columnId": "done",
+      "order": 1,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_auth_readme.md"
+    },
+    {
+      "id": "card_starter_live_theme",
+      "title": "Live home light + dark smoke",
+      "body": "Toggle as-theme=light|dark; ink/hairline readable on paper bands.",
+      "columnId": "done",
+      "order": 2,
+      "projectId": "glassbox-studio-template",
+      "projectCardId": null,
+      "filePath": "cards/card_starter_live_theme.md"
+    }
+  ]
+}

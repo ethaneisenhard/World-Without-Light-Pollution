@@ -1,0 +1,6 @@
+import type { DesignComponentMeta } from '@glassbox-studio/studio-core/browser';
+export const meta = { id: 'contact-form', title: 'Contact form', layer: 'composite', acceptsChildren: false, props: { method: { type: 'enum', values: ['get', 'post'], default: 'post', title: 'Method' } }, slots: { title: { title: 'Title' }, subtitle: { title: 'Subtitle', optional: true }, name: { title: 'Name field', optional: true }, email: { title: 'Email field', optional: true }, message: { title: 'Message field', optional: true }, submit: { title: 'Submit', optional: true } } } as const satisfies DesignComponentMeta;
+export const slotTextDefaults = { title: 'Contact us', subtitle: 'Send a short message and we will reply.', name: '', email: '', message: '', submit: '' } as const;
+export function slotsFromPlainText(text: Record<string, string>): Record<string, string> { return { title: text.title?.trim() || 'Contact us', subtitle: text.subtitle?.trim() || '', name: text.name?.trim() || '', email: text.email?.trim() || '', message: text.message?.trim() || '', submit: text.submit?.trim() || '' }; }
+export type { ContactFormProps, ContactFormSlots } from './contact-form.js';
+export { ContactForm, renderContactForm } from './contact-form.js';

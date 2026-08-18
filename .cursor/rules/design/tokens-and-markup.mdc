@@ -1,0 +1,103 @@
+---
+description: Ideal-stack design tokens (@theme, no raw hex) + Inspect data-as-* stamps + Tailwind-on-semantic-tag. Always on.
+alwaysApply: true
+---
+
+# Tokens & markup (ideal-stack)
+
+**Owns:** project `@theme` token vocabulary and the Canvas Inspector `data-as-*` contract for **project / Live** pages. **Laws** (native tags, no JS layout, dual faces): `architecture/semantic-html-css.mdc` — do not restate.
+
+## Design tokens (project `@theme`)
+
+**Golden sentence:** Visitor HTML ships **semantic token utilities** only. Raw hex / Tailwind gray-zinc-slate palettes / `white/10` opacity hacks = fail ship bar.
+
+| Job | Prefer |
+| --- | --- |
+| Page canvas | `bg-paper` `text-ink` |
+| Raised surface | `bg-paper-raised` |
+| Muted band / soft fill | `bg-sand` `text-ink-soft` |
+| Borders | `border-line` |
+| Brand / accent | `bg-accent` `text-accent` `text-inverse-fg` (on accent) |
+| Display type | `font-display` + size utilities |
+
+Map other projects the same way: **name the role in `@theme`**, then use that name in class strings — never paint with `#0f1115`.
+
+### Ship bar
+
+| Score | Styling |
+| --- | --- |
+| 0 | Raw hex/rgb; `bg-zinc-*` / `text-white` / `border-white/10` |
+| 1 | `dark:` / `light:` prefixes to fake brand appearance |
+| 2 | Opacity-only washes without `color-mix` + token |
+| 3 | Mixed semantic + raw |
+| **4+** | Semantic utilities only — **minimum to ship** |
+
+### Band model
+
+1. **Section** owns the band (`transparent` / `muted` / `brand` / `surface`) — see `design/layout.mdc`.
+2. **Children inherit** ink/soft; don't re-paint the band on Container.
+3. **Controls** (Button) bring their own surface via project `className` / `data-variant` — pick contrast for the parent band.
+4. **Never** use a flipping inverse band for normal marketing rhythm (`bg-inverse` broke under `.dark`).
+
+### Never
+
+| Don't | Why |
+| --- | --- |
+| `#fff`, `#0b1220`, `bg-slate-900`, `text-white` | Bypasses `@theme`; breaks light/dark |
+| Container `bg-*` with no border/radius | Naked slab — bordered surface rule |
+| `attrs.style` / inline `style=` for colors | Use classes + tokens |
+| Parallel token language beside `@theme` | One design system per project |
+
+## Tailwind on the semantic tag
+
+| Do | Don't |
+| --- | --- |
+| Utilities on the landmark/control (`section`, `button`, …) | Parallel BEM / big CSS modules for look |
+| Project `@theme` token utilities | Raw hex when a token exists |
+| Headless primitives take `className` from compose | Bake brand into shared primitive defaults |
+
+## Inspector attribution (`data-as-*`)
+
+Every **design-registry** render (SSR HTML **and** remix/ui) stamps Inspect so Live + DOM reading stay trivial.
+
+| Attr | Required on | Example |
+| --- | --- | --- |
+| `data-as-inspect="1"` | Component root + slot hosts | opt-in |
+| `data-as-kind` | Same | `component` \| `slot` \| `prop` \| `markdown` \| `text` |
+| `data-as-component` | Component root + its slots | registry id (`blog-hero`, `button`, `section`) |
+| `data-as-slot` | Slot hosts | `title`, `label`, … |
+| `data-as-instance` | Live page instances | `home-hero`, `home-cta-primary` |
+| `data-as-source` | When bound to a file | `content/pages/home.md` |
+
+Prefer **`stampComponentAttrs` / `stampSlotAttrs`** (`@glassbox-studio/canvas-inspector` or project `inspect-stamp`) over hand-rolled strings.
+
+```html
+<section
+  class="relative w-full …"
+  data-as-inspect="1"
+  data-as-kind="component"
+  data-as-component="blog-hero"
+  data-as-instance="home-hero"
+  data-as-source="content/pages/home.md"
+>
+  <h1 data-as-inspect="1" data-as-kind="slot" data-as-component="blog-hero" data-as-slot="title">…</h1>
+</section>
+```
+
+**Strip in prod** when `shouldStripAuthoringAttrs` — attrs are authoring-time; semantics + Tailwind stay.
+
+## Checklist (touched Live / project UI)
+
+- [ ] Laws in `architecture/semantic-html-css.mdc` held
+- [ ] No raw hex / zinc-slate-gray palette in new ideal-stack classes
+- [ ] Section band explicit; copy uses `text-ink` / `text-ink-soft` (or project equivalents)
+- [ ] Full component stamp + slot stamps; instance (+ source when file-bound)
+- [ ] Registry id = `data-as-component` (no project-id one-offs)
+- [ ] Interactive controls readable on muted **and** brand bands; light ↔ dark checked
+
+## Related
+
+- `architecture/semantic-html-css.mdc` — laws
+- `design/layout.mdc` — section / container / surface (who owns background)
+- `design/components.mdc` — slots over content props
+- `docs/design/canvas-inspector.md` · `docs/adr/0002-canvas-inspector.md`

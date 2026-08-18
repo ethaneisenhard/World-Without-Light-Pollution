@@ -1,0 +1,48 @@
+{
+  "id": "consent",
+  "kind": "consent",
+  "label": "Consent",
+  "provider": "first-party",
+  "policyVersion": "1",
+  "banner": {
+    "title": "We value your privacy",
+    "description": "We use cookies and similar technologies to measure traffic, remember preferences, and improve this site. You can change your choices anytime.",
+    "acceptAllLabel": "Accept all",
+    "rejectNonEssentialLabel": "Reject non-essential",
+    "customizeLabel": "Customize",
+    "privacyPolicyUrl": "/privacy"
+  },
+  "categories": {
+    "strictly_necessary": {
+      "label": "Strictly necessary",
+      "description": "Required for security, network delivery, and basic site operation. Always on."
+    },
+    "functional": {
+      "label": "Functional",
+      "description": "Preference storage and embedded media that improve the experience."
+    },
+    "analytics": {
+      "label": "Analytics",
+      "description": "Anonymous usage measurement so we know what to improve."
+    },
+    "marketing": {
+      "label": "Marketing",
+      "description": "Campaign attribution and ad performance."
+    },
+    "personalization": {
+      "label": "Personalization",
+      "description": "Tailored content and experiment assignments."
+    }
+  },
+  "preferences": {
+    "linkLabel": "Cookie preferences",
+    "title": "Your privacy choices",
+    "saveLabel": "Save preferences",
+    "closeLabel": "Close"
+  },
+  "transparency": {
+    "enabled": true,
+    "title": "What's on this site",
+    "description": "Scripts and analytics events declared for this project, grouped by consent category."
+  }
+}

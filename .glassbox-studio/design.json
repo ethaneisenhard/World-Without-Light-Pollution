@@ -1,0 +1,41 @@
+{
+  "theme": {
+    "source": "package",
+    "package": "@glassbox-studio/studio-theme-default"
+  },
+  "brand": {
+    "name": "Studio Starter",
+    "initials": "SS",
+    "tagline": "Ideal-stack marketing template."
+  },
+  "shell": {
+    "color": {
+      "fg": {
+        "accent": "#0f766e",
+        "onAccent": "#ffffff",
+        "primary": "#134e4a",
+        "secondary": "#0f766e"
+      },
+      "bg": {
+        "canvas": "#f7fafa",
+        "surface": "#ffffff",
+        "sidebar": "#f0fdfa",
+        "muted": "#ccfbf1"
+      }
+    },
+    "colorDark": {
+      "fg": {
+        "accent": "#2dd4bf",
+        "onAccent": "#042f2e",
+        "primary": "#ecfdf5",
+        "secondary": "#99f6e4"
+      },
+      "bg": {
+        "canvas": "#0f1f1c",
+        "surface": "#122824",
+        "sidebar": "#134e4a",
+        "muted": "#115e59"
+      }
+    }
+  }
+}

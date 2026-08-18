@@ -1,0 +1,12 @@
+# Copy to .dev.vars (gitignored) for local dev. Wrangler injects these into the Worker.
+# Google OAuth — reuse the Glass Box Studio client or create a new one in Google Cloud Console.
+# Add this authorized redirect URI to that OAuth client:
+#   http://127.0.0.1:8794/auth/google/callback
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+
+# Stable session secret (must not change across restarts or sessions/OAuth break).
+SESSION_SECRET=dev-only-walp-session-secret-change-me
+
+# Public origin for Google redirect_uri + password-reset links.
+APP_ORIGIN=http://127.0.0.1:8794

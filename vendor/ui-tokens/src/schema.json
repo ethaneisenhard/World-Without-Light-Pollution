@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentStudioTheme",
+  "type": "object",
+  "required": ["version", "name", "color", "space", "radius", "font"],
+  "properties": {
+    "version": { "type": "integer", "const": 1 },
+    "name": { "type": "string" },
+    "color": { "type": "object" },
+    "space": { "type": "object" },
+    "radius": { "type": "object" },
+    "font": { "type": "object" }
+  }
+}

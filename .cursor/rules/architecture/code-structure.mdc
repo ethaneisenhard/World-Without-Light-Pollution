@@ -1,0 +1,76 @@
+---
+description: Keep files ≤1000 lines and folder roots ≤25 files — split into domain modules before they balloon. Always on.
+alwaysApply: true
+---
+
+# Code structure — size & folder hygiene (always on)
+
+**Golden sentence:** Files coordinate domains; modules own one job. A file over ~1000 lines, or a folder root over ~25 flat siblings, is a smell — split into domain modules/subfolders before the next change lands.
+
+## Module size limit
+
+| Lines (non-test source) | Meaning |
+| --- | --- |
+| **≥ 1000** | **Stop adding.** Plan a split before the next feature or refactor lands more code in the same file. |
+| **800–999** | Yellow zone — prefer new helpers in sibling modules; don't expand the god file. |
+| **≤ 600** | Target for hot paths and shell hosts agents edit often. |
+
+Count includes the file you're editing. **Exclude:** `*.test.ts`, `*.generated.*`, vendored bundles, JSON/CSS asset blobs, `public/*.js` build output.
+
+### What to do at 1000+
+
+1. **Name the domains** — what jobs share one file? (URL/boot, pure layout, DOM mount, chat, trees, canvas)
+2. **Split along architecture seams** — match `build-patterns.mdc` + `remix/ui-state.mdc`:
+   - `*-pure.ts` / `*-logic.ts` — deterministic transforms, no DOM/fetch
+   - `*-machine.ts` — pure XState, no DOM/fetch
+   - `*-connector.ts` / `*-mount.ts` — wire I/O / DeskPane / Handle
+   - `*-host.tsx` / `*-host.ts` — thin UI host that walks registries
+3. **Move into a domain folder or sibling modules** — one concern per file; thin barrels only if needed.
+4. **Re-export from a thin barrel** if call sites expect one import — don't keep logic in the barrel.
+
+| Smell in one file | Split into |
+| --- | --- |
+| Shell Handle mega-file (`app.tsx`) | zone hosts (`left-rail-host`, canvas chrome) + connectors + pure |
+| Machine + connector + paint | machine / pure / connector |
+| API routes + handlers | route table + `handlers/<domain>.ts` |
+| Tree + portal + sync | `*-pure.ts` + `*-mount.ts` |
+| Chat sessions + rail + composer | session pure/store + rail host + panel render |
+
+**Known offender:** `apps/studio/client/app.tsx` (~10k+ lines) — any left-rail / shell feature must **extract** a host module; do not grow the monolith with another in-place JSX block.
+
+## Folder hygiene
+
+**Golden sentence:** Folders organize domains; a flat root full of siblings is a smell — split into domain subfolders before it balloons.
+
+| Non-test source files at one folder root | Meaning |
+| --- | --- |
+| **≥ 25** | **Stop adding.** Group by domain into a subfolder before the next sibling lands. |
+| **15–24** | Yellow — prefer a new domain folder over another root file. |
+| **≤ 12** | Target for hot dirs agents edit often (`apps/studio/client`, package `src/`). |
+
+**Count:** `.ts` / `.tsx` / `.js` / `.jsx` at that directory (not recursive). **Exclude:** `*.test.ts(x)`, `*.generated.*`, `node_modules`, build/`dist`/`public` bundles, CSS-only asset dumps, thin `index.ts` barrels that only re-export.
+
+Tests **colocate** with the module inside the domain folder (or mirror the same tree) — not dumped into a parallel flat root.
+
+### How to organize
+
+1. **Name domains** — shared prefix or job (`canvas-*`, `media-*`, `left-rail-*`, handlers).
+2. **Move into a domain folder** — e.g. `client/canvas/`, `client/media/`, `handlers/files/`.
+3. **Keep seams** — `*-pure` / `*-machine` / `*-connector` / `*-host` stay together in that domain.
+4. **Thin barrel only if needed** — `index.ts` re-exports for stable imports; no logic in the barrel.
+5. **Root may keep entrypoints** — e.g. `entry.tsx`, `app.tsx`, `app-root.tsx` — not every leaf.
+
+**Known offender:** `apps/studio/client/` — flat root with 100+ modules. **New** canvas/media/shell work goes into a **domain subfolder** (or extract wave), not another root sibling.
+
+## Agent checklist (every edit)
+
+- [ ] If target file is **≥ 1000 lines**, split plan is part of the task — not a follow-up ticket
+- [ ] Target folder root is under the yellow/hard cap — or this change includes a domain-folder move
+- [ ] New concern → new module / domain folder, not appended to an 800+ line file
+- [ ] After split: update imports; run surface tests (`pnpm --filter @glassbox-studio/app test` / package vitest)
+
+## Related
+
+- `architecture/build-patterns.mdc` — pure / orchestrator seams after split
+- `remix/ui-state.mdc` — machine seams inside domains
+- Do not raise line caps to avoid splitting. Ratchet **down** when domain modules land.

@@ -1,0 +1,6 @@
+{
+  "id": "ai",
+  "kind": "ai",
+  "label": "AI",
+  "provider": "anthropic"
+}

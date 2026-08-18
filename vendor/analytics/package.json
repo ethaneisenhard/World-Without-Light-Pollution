@@ -1,0 +1,25 @@
+{
+  "name": "@glassbox-studio/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Canonical analytics call site — track, page, identify, envelope, destinations transport. Adoptable by any Glass Box Studio project.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./environment": "./src/environment.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@glassbox-studio/consent": "workspace:*",
+    "@glassbox-studio/identity": "workspace:*"
+  },
+  "devDependencies": {
+    "@glassbox-studio/studio-analytics": "workspace:*",
+    "happy-dom": "^20.10.6",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

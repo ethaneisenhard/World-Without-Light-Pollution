@@ -1,0 +1,4 @@
+{
+  "defaultHarness": "cursor",
+  "allowedHarnesses": ["cursor", "anthropic", "deepseek", "kody", "hermes", "grok"]
+}

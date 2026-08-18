@@ -1,0 +1,69 @@
+---
+description: Caught Studio errors summarize and send to Chat to fix; auto when ui.selfHealErrors is on.
+alwaysApply: true
+---
+
+# Self-heal errors (always on — design principle)
+
+**Golden sentence:** Every caught Studio error face can **summarize → Chat → fix**. When **Self-heal errors** is on in Settings → AI, that path **auto-fires** (deduped). Manual **Ask chat to fix** stays available on error faces either way.
+
+Audience: **Studio chrome** (`apps/studio/**`). Not Host operator plane (ADR 0019) — that heals desk Host crash-loops. This principle is **product error → chat agent**.
+
+## Law
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **One seam** — new error catch / overlay calls `requestSelfHeal` (or documents why not) | One-off “Retry only” with no chat path |
+| 2 | **Pref** — auto-send gated by `ui.selfHealErrors` (default **off**) | Silent auto-chat without Settings toggle |
+| 3 | **Summarize** — `summarizeSelfHealPrompt` pure; no raw dump-only paste without ask-to-fix | Paste stack with no “please fix” intent |
+| 4 | **Dedupe** — auto path cools same signature (~60s) | Refresh / paint loops spam chat turns |
+| 5 | **Manual always** — Ask chat to fix works with `force: true` even when auto off | Mode off removes all chat escape |
+
+## Shape
+
+```
+error catch / face
+ → requestSelfHeal({ source, title, detail, context }, { force? })
+ → pure summarize + signature / cooldown
+ → open Chat + sendMessage(prompt)
+```
+
+| Layer | Module |
+| --- | --- |
+| Pure | `packages/studio/studio-core/src/self-heal-error-pure.ts` |
+| Pref | `StudioConfig.ui.selfHealErrors` |
+| Connector | `apps/studio/client/errors/self-heal-error-connector.ts` |
+| Settings | Settings → AI → Self-heal errors (`studioSwitch`) |
+
+## Surfaces (extend — don't fork)
+
+| Surface | Call |
+| --- | --- |
+| Website Preview start / iframe error | Live runtime CTA |
+| Client / boot banner | Banner + `reportClientError` auto |
+| New overlays / modals | Same `requestSelfHeal` |
+
+Host-down / operator heal stays ADR 0019 — may still offer Ask chat when product wants it; do not replace operator exec with chat-only.
+
+## Forbidden
+
+| Don't | Why |
+| --- | --- |
+| Auto-send with pref off | Surprises users / burns turns |
+| Heal-in-render storms without signature cooldown | Chat spam |
+| Bare “Host” / deploy jargon in prompt face copy | `studio-product-copy` |
+| Per-surface custom prompt builders | One pure summarizer |
+
+## Agent checklist
+
+- [ ] New error UI → `requestSelfHeal` (auto on paint when appropriate + Ask chat button)
+- [ ] Pref still `ui.selfHealErrors`; Settings switch present
+- [ ] Unit covers summarize + cooldown + force path
+- [ ] Not a second Host-heal one-off
+
+## Related
+
+- `ui-state.mdc` — pending while chat turn runs
+- `open-tab-activates.mdc` — open Chat focused
+- ADR [0019](../../docs/adr/0019-host-heal-operator-plane.md) — Host crash operator plane (different job)
+- `studio-product-copy` skill — plain error titles

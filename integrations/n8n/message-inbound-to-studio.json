@@ -1,0 +1,81 @@
+{
+  "name": "Studio Messages — inbound ingest",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "message-inbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-message-inbound",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "studio-message-inbound"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nconst projectId = String(body.projectId || 'glassbox-studio-template').trim();\nconst text =\n  (body.body && body.body.text) ||\n  body.text ||\n  body.message ||\n  (typeof body === 'string' ? body : JSON.stringify(body));\nconst channel = ['email','slack','telegram','whatsapp','sms','webhook','other'].includes(body.channel)\n  ? body.channel\n  : 'webhook';\nconst conversationId = String(\n  body.conversationId ||\n  body.threadId ||\n  `n8n:${channel}:${body.from?.address || body.from || 'anon'}`\n);\nreturn [{\n  json: {\n    projectId,\n    envelope: {\n      conversationId,\n      channel,\n      direction: body.direction === 'out' ? 'out' : 'in',\n      from: body.from && typeof body.from === 'object'\n        ? body.from\n        : { name: String(body.from || 'n8n'), address: 'n8n' },\n      to: body.to,\n      body: { text: String(text || '').trim() || '(empty)' },\n      status: body.status === 'read' ? 'read' : 'unread',\n      hasAttachment: Boolean(body.hasAttachment),\n    },\n  },\n}];"
+      },
+      "id": "normalize-envelope",
+      "name": "Normalize envelope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [260, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://127.0.0.1:4400/api/projects/{{ $json.projectId }}/messages",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.envelope }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "post-studio-messages",
+      "name": "POST Studio Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { ok: true, studio: $json } }}",
+        "options": {}
+      },
+      "id": "respond-ok",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [780, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Normalize envelope", "type": "main", "index": 0 }]]
+    },
+    "Normalize envelope": {
+      "main": [[{ "node": "POST Studio Messages", "type": "main", "index": 0 }]]
+    },
+    "POST Studio Messages": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "description": "n8n → Studio Messages inbox. POST /webhook/message-inbound with { text, channel?, conversationId?, projectId? }. See docs/architecture/messages-inbox-ingest.md"
+  },
+  "tags": [{ "name": "glassbox-studio" }, { "name": "messages" }]
+}

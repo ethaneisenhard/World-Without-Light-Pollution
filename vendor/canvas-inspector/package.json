@@ -1,0 +1,22 @@
+{
+  "name": "@glassbox-studio/canvas-inspector",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./guest": "./src/guest-runtime.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "build:guest": "node scripts/build-guest.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "esbuild": "^0.25.0",
+    "happy-dom": "^20.10.6",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

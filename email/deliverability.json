@@ -1,0 +1,8 @@
+{
+  "domain": "northline.local",
+  "fromDomains": ["northline.local"],
+  "spf": false,
+  "dkim": false,
+  "dmarc": false,
+  "notes": "Flip SPF/DKIM/DMARC to true after Cloudflare Email Sending domain onboard."
+}

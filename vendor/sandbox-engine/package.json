@@ -1,0 +1,32 @@
+{
+  "name": "@glassbox-studio/sandbox-engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./html": "./src/html/index.ts",
+    "./client/inspector": "./src/client/inspector.js",
+    "./remix": "./src/remix/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@glassbox-studio/studio-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "remix": "3.0.0-beta.5"
+  },
+  "peerDependenciesMeta": {
+    "remix": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "remix": "3.0.0-beta.5",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

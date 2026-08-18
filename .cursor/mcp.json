@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "glassbox-studio": {
+      "url": "http://127.0.0.1:3847/api/mcp?projectId=glassbox-studio-template",
+      "headers": {}
+    }
+  }
+}

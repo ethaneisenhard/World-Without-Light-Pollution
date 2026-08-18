@@ -1,0 +1,8 @@
+{
+  "id": "primary-d1",
+  "kind": "d1",
+  "label": "Primary D1",
+  "binding": "DB",
+  "localPath": ".data/primary.sqlite",
+  "capabilities": ["records", "forms", "analytics"]
+}

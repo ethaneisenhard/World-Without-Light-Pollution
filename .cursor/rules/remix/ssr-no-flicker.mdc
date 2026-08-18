@@ -1,0 +1,121 @@
+---
+description: No flicker/flash — first-paint prefs in SSR HTML; prefer SSR/loader; else explicit loading face, never an empty lie. Always on.
+alwaysApply: true
+---
+
+# SSR boot payload + no flash (always on)
+
+**Golden sentence:** Anything that paints on the **first chrome frame** and comes from Host/config/sticky prefs must travel in the **SSR HTML document**. When data can't be in the document yet, paint an explicit **loading** face until ready — never empty / default / wrong content as truth that heals later.
+
+Applies to **Studio** (`apps/studio/`) and **ideal-stack** (`projects/*`). Canonical docs: [ssr-boot-payload.md](../../docs/architecture/ssr-boot-payload.md) · ADR [0015](../../docs/adr/0015-ssr-boot-payload.md).
+
+## Law
+
+```
+URL / SSR boot payload / loader data  →  first paint
+Later /api                            →  confirm only (same signature = no-op)
+```
+
+| Do | Don't |
+| --- | --- |
+| Embed first-paint prefs in HTML (JSON / CSS / tiny boot JS) | Machine default paint → post-hydrate fetch → rewrite |
+| Soft-timeout Host during SSR; always return HTML | Block document on slow Host |
+| Client **sync** read before that control paints | `useEffect` / connector fetch as first paint SoT |
+| Re-apply only when config **signature** changes | Blind overwrite every config GET |
+| Catalog new kinds in `docs/architecture/ssr-boot-payload.md` | One-off `window.__foo` with no pure/orchestrator |
+
+## Decision tree (first paint vs hydrate)
+
+```
+Paints on first chrome frame (or default open pane)?
+  NO  → normal loader / connector / machine OK
+  YES → Shareable in URL?
+          YES → URL owns it (params). SSR may mirror for FOUC.
+          NO  → Host/config/sticky?
+                  YES → SSR boot payload (this rule)
+                  NO  → Ephemeral — document why; still no flash-heal
+```
+
+```
+Will first paint show content that depends on Host/API/ledger?
+  YES → Can SSR / route loader embed it (or a known pref)?
+          YES → SSR boot / loader first paint
+          NO  → Machine/status pending → loading chrome until ready
+  NO  → Normal paint
+```
+
+| Situation | Paint | Fail if |
+| --- | --- | --- |
+| Sticky pref / config known at document | **SSR boot** or URL | Default → `/api` → rewrite face |
+| List / ledger / inbox still hydrating | **Loading** (`aria-busy`, spinner/copy) | Empty-hello / "No chats" / "Inbox empty" then swap |
+| User mutation in flight | Pending / optimistic | Silent wait or fake idle empty |
+| Load failed | Error / retry face | Infinite spinner with no escape |
+
+## Kinds (extend the doc table — don't fork)
+
+| Kind | Pattern today |
+| --- | --- |
+| AI defaults (harness / model / mode) | `#as-boot-ai` · `studio-boot-ai-*` · `ssr-boot-ai-orchestrator` |
+| Host attach (Cloud Host / Local Host) | `#as-boot-host` · `studio-boot-host-*` · `ssr-boot-host-orchestrator` |
+| Capabilities / Harnesses cards | `#as-boot-capabilities` · `studio-boot-capabilities-*` |
+| Workspace shell theme | SSR `<style id="as-project-shell-theme">` · `ssr-project-shell-orchestrator` |
+| Color mode | `color-mode-boot.js` |
+| Open tabs / project / focus | **URL** (not a second boot bag) |
+| Ideal-stack first viewport | Route **loader** / SSR HTML |
+
+**Rule of thumb:** if a screenshot in the first ~200ms after reload can show the wrong value → URL or boot payload.
+
+## Shape (Studio)
+
+```
+ssr-render → Promise.all(orchestrators) → SsrDocument inline payload
+*-pure.ts → serialize / parse / seed key
+*-host.ts → document sync read (cached)
+machine / session defaults ← boot before first paint
+```
+
+## Laws (loading face)
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **SSR first** — if it paints on frame one and Host already knows it, put it in the document | Client default flash then heal |
+| 2 | **Loading > empty lie** — unbound / loading / leaving must not claim "no data" | Empty hero / "No chats" before ledger |
+| 3 | **Ready owns empty** — only after hydrate/ready may empty copy paint | Empty and loading share the same face |
+| 4 | **Pure gate** — `resolve*Face({ phase/status, … })`; not ad-hoc host `if` | Paint path guesses "probably empty" |
+| 5 | **Stamp pending** — `data-*-hydrate="pending"` / `aria-busy` when loading | Spinner with no ownership |
+
+```typescript
+// chat sessions example
+chatSessions phase unbound|loading|leaving
+  → log + history / recents: Loading chats…
+phase ready + empty log → empty hello (one New chat)
+phase ready + turns → latest thread, scrolled to bottom
+```
+
+Pure: `apps/studio/client/chat/chat-hydrate-face-pure.ts`. Composer may still accept a new message while the log shows **Loading chats…**.
+
+## Forbidden (flicker / flash class)
+
+- Anthropic/Haiku → Cursor/Composer after config lands
+- Default green shell → project brand after `design.json` fetch
+- Light page → dark after `localStorage` read (use boot script)
+- Global scope face → workspace after projects list hydrates **without** URL/pending
+- History / recents claiming "No chats" while sessions machine still `loading` / `unbound` / `leaving`
+- Two synthetic "New chat" tabs from boot stub + ledger hydrate
+- "Inbox empty" before first successful ledger load
+- Any "it should be fast so skip pending / skip boot"
+
+## Agent checklist
+
+- [ ] New first-paint pref → catalog row + pure + SSR orchestrator + sync reader
+- [ ] Defaults initialized from boot (not only after `/api`); later fetch dedupes on signature
+- [ ] New async list/pane: pending face until ready — never empty-as-truth mid-load
+- [ ] Empty copy only after confirmed ready/error
+- [ ] Not a one-off `window` global without seams
+- [ ] Unit/HVT: early matches payload; late fetch does not shift
+
+## Related
+
+- `remix/remix-patterns.mdc` — ship bar (points here)
+- `remix/ui-state.mdc` — state ladder; pending when slow (boot is for **known** prefs at document time)
+- `docs/architecture/ssr-boot-payload.md` — full catalog + proof commands

@@ -1,0 +1,55 @@
+{
+  "id": "analytics",
+  "kind": "analytics",
+  "store": "primary-d1",
+  "destinations": [
+    {
+      "provider": "first-party",
+      "enabledIn": [
+        "dev",
+        "staging",
+        "production"
+      ],
+      "events": "*",
+      "config": {
+        "path": "/api/events"
+      }
+    }
+  ],
+  "funnels": [
+    {
+      "id": "visit-nav-form",
+      "title": "Visit → Nav → Form",
+      "windowDays": 7,
+      "steps": [
+        {
+          "event": "pageview",
+          "label": "Page viewed"
+        },
+        {
+          "event": "nav_link_clicked",
+          "label": "Nav link clicked"
+        },
+        {
+          "event": "form_submitted",
+          "label": "Form submitted"
+        }
+      ]
+    },
+    {
+      "id": "page-cta",
+      "title": "Page → CTA",
+      "windowDays": 7,
+      "steps": [
+        {
+          "event": "pageview",
+          "label": "Page viewed"
+        },
+        {
+          "event": "cta_clicked",
+          "label": "CTA clicked"
+        }
+      ]
+    }
+  ]
+}

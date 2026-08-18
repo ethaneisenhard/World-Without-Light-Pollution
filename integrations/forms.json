@@ -1,0 +1,7 @@
+{
+  "id": "forms",
+  "kind": "forms",
+  "honeypot": true,
+  "defaultDestination": "primary-d1",
+  "upsertUsers": true
+}

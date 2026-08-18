@@ -1,0 +1,282 @@
+---
+description: >-
+  CSS document-flow law — general CSS/Tailwind practice + Studio chrome policy
+  (ADR 0007)
+alwaysApply: true
+---
+
+# CSS document flow (always on)
+
+**Golden sentence:** Layout is a **containing-block** problem. Pick the right display mode for each box. Never invent a second layout system to paper over the first.
+
+ADR: `docs/adr/0007-natural-document-flow.md`. Twin (Studio panes): `layout.mdc`.
+
+## Audience — who follows what
+
+| Surface | Path | Follow |
+| --- | --- | --- |
+| **General CSS / Tailwind** | Studio chrome **and** ideal-stack (`projects/*`) | **§ General practice** — MDN / Flexbox / Chrome-aligned |
+| **Studio chrome policy** | `apps/studio/**` only | **§ Studio policy** — stricter product recipes (rails, DeskPane, chat) |
+
+Ideal-stack does **not** inherit Studio’s “overflow-only / no `min-w-0`” default — that is Studio chrome taste. Ideal-stack still follows general facts, sparse flex/grid, and “no escape-hatch creativity.”
+
+Tone in both sections: **Must / Must not / Recipe**. No inventing a 4th layout system.
+
+---
+
+## CSS facts (why — MDN / CSSWG)
+
+| # | Fact | Fail if ignored |
+| --- | --- | --- |
+| 1 | **Normal flow** — block boxes stack; inlines run; block width = containing block | `flex-col` “to stack” |
+| 2 | **Containing block** — usually content box of nearest block/flex/grid ancestor | Child “won’t shrink” — parent never got a definite width |
+| 3 | **Flex/grid** create a formatting context — children leave normal flow | Nested flex/grid = second min-size graph |
+| 4 | Flex item default **`min-width`/`min-height: auto`** = content minimum | Long title / `<button>` blows past the pane |
+| 5 | Overflow ≠ `visible` → that auto minimum becomes **0** (item can shrink) — **same effect as `min-width: 0`** | Wrong overflow placement; or clipping menus that must paint outside |
+| 6 | **`overflow-y: auto`** + definite height = **scrollport** | `overflow-hidden` on the thing that should scroll |
+| 7 | **`<button>` has intrinsic sizing** — not a normal block | Expecting bare `block`+`truncate` without flex-item + overflow/min-size |
+| 8 | **Sticky** sticks to nearest scroll ancestor; margins affect stick math | Surprise gaps / early unstick |
+| 9 | **Grid** = 2D track skeleton; **flex** = 1D peer row/column | Content `grid-cols-1` “for truncation” |
+| 10 | **Percentage** width/height need a definite containing size | Cargo-cult `w-full` / `h-full` instead of tracks |
+| 11 | **`contain` / `container-type`** = isolation + **container queries** — not a truncate recipe | Using `contain-inline-size` to fake narrow-rail width |
+
+**Sources:** [MDN flow layout](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Display/Flow_layout) · [Flexbox §4.5 automatic minimum size](https://www.w3.org/TR/css-flexbox-1/#min-size-auto) · [Chrome modern-web-guidance — CSS layout](https://github.com/GoogleChrome/modern-web-guidance/blob/main/skills/modern-web-guidance/guides/css-layout/css-layout.md) · [Jake Archibald — page layout](https://jakearchibald.com/2014/dont-use-flexbox-for-page-layout/)
+
+---
+
+## § General practice (Studio + ideal-stack)
+
+Applies everywhere Tailwind/`@theme` UI ships. Matches industry CSS guidance.
+
+### Three boxes
+
+| Box | Job | Tailwind skeleton |
+| --- | --- | --- |
+| **A. Shell / page band** | Split viewport or major regions into tracks | **One** `grid` *or* outer `flex` |
+| **B. Pane column** | Fill leftover height; pin chrome; one scroll leaf | `flex flex-col overflow-hidden` → child `flex-1 overflow-y-auto` |
+| **C. Content** | Document / list / form / marketing band | **Block/inline** default; **one** `flex`/`inline-flex` for peer rows; **grid OK** when the node is a true **2D track skeleton** |
+
+**Must not** invent a 4th box: content `grid-cols-1` / nested `grid-rows` / `contain-*` **as layout escape hatches** for truncation.
+
+### Decision tree
+
+```
+1. Viewport / major region track split (or true 2D component skeleton)?
+   → YES: grid (or outer flex) ONCE for that job. Stop.
+2. Pane (chrome + filling body + chrome)?
+   → YES: pane recipe (Law G3). Stop.
+3. Siblings in one row (icon+label, avatar+bubble)?
+   → YES: ONE flex/inline-flex parent. Truncate/shrink on sharing children. Stop.
+4. Else:
+   → Block/inline. space-y / margins. truncate on text if needed.
+   → Truncate fails? Fix ancestry — do NOT invent grid-cols-1 / contain-* hacks.
+```
+
+### Laws G1–G10 (general)
+
+#### Law G1 — Default is normal flow
+
+| Must | Must not |
+| --- | --- |
+| New wrappers: **no** `flex` / `grid` unless this node arranges **peers**, a **pane**, a **shell/page band**, or a **2D track skeleton** | `flex flex-col` for stacking or gap alone → use `space-y-*` / margins |
+
+#### Law G2 — One layout parent per concern
+
+| Must | Must not |
+| --- | --- |
+| At most **one** flex/grid ancestor per layout job | Flex/grid on section + group + row + title |
+
+#### Law G3 — Pane recipe (app columns / rails)
+
+```
+[pane]    flex flex-col overflow-hidden
+  [chrome]  shrink-0
+  [scroll]  flex-1 overflow-x-hidden overflow-y-auto   ← ONLY scrollport
+  [chrome]  shrink-0
+```
+
+| Must not |
+| --- |
+| Nested scrollports for the same list |
+| `grid` / `grid-rows` for the scroll leaf “to fill” |
+
+#### Law G4 — Overflow placement is surgical
+
+| Need | Where |
+| --- | --- |
+| Pane can shrink in a flex parent | `overflow-hidden` on the **pane** |
+| List / log scrolls | `overflow-y-auto` on the **scroll leaf only** |
+| Flex child must not widen the track | `overflow-hidden` / `overflow-x-auto` **or** `min-w-0` / `min-inline-size: 0` on **that flex child** |
+| Text ellipsis | That child (or its text) also `truncate` |
+
+| Must not |
+| --- |
+| `overflow-hidden` on every ancestor “to be safe” (clips popovers/tooltips) |
+| `contain-inline-size` / `contain-*` as a **layout/truncate** system |
+
+**OK:** `container-type: inline-size` (and Tailwind `@container`) for **container queries** — that is not a truncate hack.
+
+#### Law G5 — Truncation recipe (narrow columns / list buttons)
+
+```
+[scroll] flex flex-col flex-1 overflow-x-hidden overflow-y-auto
+  [row]    flex … overflow-hidden   (or min-w-0)   ← flex ITEM of scroll
+    [title] overflow-hidden truncate
+```
+
+Optional: section wrapper `contents` so rows stay flex items of the scroll leaf.
+
+| Must not |
+| --- |
+| Content `grid` / `grid-cols-1` “to force width” |
+| `contain-inline-size` for truncate |
+| Layout `max-w-*` clamps on leaves to fake the track |
+
+#### Law G6 — Grid = 2D track skeletons
+
+| Must | Must not |
+| --- | --- |
+| Grid when the node needs **rows AND columns** (page shell, card internals with tracks, form “label \| field”, marketing section tracks, Design atlas) | Content `grid` / `grid-cols-1` to force truncate or fill a 1D list |
+| Prefer **one** grid per concern; subgrid when grandchildren must align to parent tracks | Nested content grids fighting a parent shell grid for **fill/scroll** |
+
+Detail for Studio panes: `layout.mdc`.
+
+#### Law G7 — Fill with tracks; percentages sparingly
+
+| Must | Must not |
+| --- | --- |
+| Grow with `flex-1` / `1fr` under a real flex/grid parent | Cargo-cult `w-full` / `h-full` on every wrapper |
+| **OK:** `w-full` / `inline-size: 100%` on **replaced media** (`img`, video, iframe) with `aspect-ratio` inside a definite containing block | `w-full` / `h-full` as the **pane fill** instead of `flex-1` |
+
+#### Law G8 — Sticky chrome
+
+| Must | Must not |
+| --- | --- |
+| `sticky` + inset (`top-0`) + opaque bg when covering content | Assume sticky works across an `overflow` ancestor that isn’t the intended scrollport |
+
+**Scrollport section headers (lists):** prefer **no margin** on the sticky node — margins create gap bands when stuck. Marketing sticky nav may use margin; verify against the real scrollport.
+
+#### Law G9 — Semantic HTML first
+
+| Must | Must not |
+| --- | --- |
+| Real landmarks/controls (`nav`, `button`, …) | `div` soup + grid/flex to fake structure |
+
+#### Law G10 — No escape-hatch creativity
+
+If layout fights → **wrong box or wrong overflow/min-size placement**.
+
+| Must not add |
+| --- |
+| `contain-*` for **layout/truncate** (CQ `container-type` stays OK) |
+| Content `grid-cols-1` / nested `grid-rows` for fill/truncate |
+| `!important` layout wars |
+| Measure → `style` / `getBoundingClientRect` for everyday layout |
+
+### Tailwind cheat sheet (general)
+
+| Intent | Tailwind | Never |
+| --- | --- | --- |
+| Stack blocks | *(none)* / `space-y-*` | `flex flex-col` for gap alone |
+| Peer row | `flex` / `inline-flex` + `gap-*` | flex on the text leaf |
+| Pane column | `flex flex-col overflow-hidden` | nested `grid-rows` for scroll |
+| Scroll leaf | `flex-1 overflow-x-hidden overflow-y-auto` | `overflow-hidden` alone on leaf |
+| Grow in track | `flex-1` / `1fr` | `h-full` as pane fill |
+| Don’t widen track | overflow on flex child **or** `min-w-0` | spray both everywhere |
+| Ellipsis | `truncate` on the shrinking text | clip via distant parent only |
+| 2D skeleton | one `grid` … | `grid-cols-1` to fake width |
+| Media fill | `w-full` + `aspect-ratio` OK | percentage height wars |
+| CQ | `@container` / `container-type` | `contain-inline-size` as truncate |
+
+---
+
+## § Studio chrome policy (`apps/studio/**` only)
+
+Stricter product law for DeskPane, rails, chat, settings. **Ideal-stack agents: skip this section** unless building Studio-like app chrome.
+
+### Why stricter
+
+Agents over-applied `min-w-0`, content `grid`, and `contain-inline-size` in Studio rails. Studio defaults to the **overflow-on-flex-child** recipe (spec-equivalent to `min-width: 0` per Flexbox §4.5) so the decision tree stays one path.
+
+### Policy S1 — Prefer overflow; `min-w-0` is last resort
+
+| Default (Studio) | Exception |
+| --- | --- |
+| Flex child that must shrink → `overflow-hidden` / `overflow-x-auto` (not `min-w-0`) | Child must shrink **and** must **not** clip (menus, popovers, absolute children that paint outside) → **`min-w-0` / `min-inline-size: 0` OK** |
+
+| Must not (Studio) |
+| --- |
+| New `min-w-0` / `min-h-0` as the first reflex on every flex item |
+| `overflow-hidden` high in the tree that clips intentional overlays |
+
+### Policy S2 — Grid in product chrome is shell-first
+
+| Must (Studio chrome) | Must not |
+| --- | --- |
+| Body / stage tracks = grid once; panes = Law G3 flex | Content `grid` inside chat, recents rails, settings lists, empty states |
+| Design atlas / true 2D chrome tools may use component grid | `grid-cols-1` “to make truncate work” |
+
+### Policy S3 — No percentage fill for panes
+
+| Must | Must not |
+| --- | --- |
+| Pane fill = `flex-1` / shell `1fr` | New `w-full` / `h-full` on chrome wrappers for fill |
+| Media / iframe preview surfaces may use `w-full` + aspect when the containing track is definite | Percentage height chains through DeskPane |
+
+### Policy S4 — Sticky list headers: no margin
+
+Recents / day headers / sticky section labels in scrollports: **`sticky top-0` + opaque `bg-*`, no `mb-*` / list `py-*` gap bands**.
+
+### Policy S5 — DeskPane / dual-face stay in shell rules
+
+Overflow bands + scroll leaf: `shell/studio-windows.mdc`. No `!important` / DP wars: `shell/chrome-css.mdc`.
+
+### Studio truncation recipe (locked)
+
+```
+[scroll] flex flex-col flex-1 overflow-x-hidden overflow-y-auto
+  [row]    flex … overflow-hidden          ← flex ITEM (not min-w-0 by default)
+    [title] overflow-hidden truncate
+```
+
+### Studio checklist (extra)
+
+- [ ] General laws G1–G10 held
+- [ ] No new `min-w-0` unless popover/clip exception (S1)
+- [ ] No content `grid` in rails/chat/settings lists (S2)
+- [ ] No `w-full`/`h-full` pane fill (S3)
+- [ ] Sticky section headers: no margin (S4)
+- [ ] Truncate = overflow flex item + `truncate` — not grid/contain
+
+---
+
+## Lessons encoded (do not re-learn)
+
+| Bug | Broken assumption | Where |
+| --- | --- | --- |
+| Titles clipped, no `…` | Button intrinsic width; not a shrinking flex item | G5, S1 |
+| “Fix” with `grid-cols-1` | Second track graph in a content pane | G6, S2 |
+| “Fix” with `contain-inline-size` | Escape hatch ≠ formatting model (CQ ≠ truncate) | G4, G10 |
+| Sticky header gaps | Margin on sticky vs scrollport | G8, S4 |
+| Nested `overflow-hidden` everywhere | Overflow is placement, not seasoning; clips menus | G4, S1 |
+
+## Agent checklist (every UI edit)
+
+- [ ] Named audience: **general** vs **Studio policy**
+- [ ] Decision tree run — box A / B / C (or 2D skeleton) named
+- [ ] No new flex/grid unless peer row, pane, shell/page, or true 2D skeleton
+- [ ] Pane uses G3; only one scroll leaf
+- [ ] Truncate uses G5 — not grid/contain hacks
+- [ ] CQ `container-type` OK; `contain-*` as truncate **not** OK
+- [ ] Studio chrome: also S1–S5
+- [ ] Child cannot widen/heighten the pane
+
+## Related
+
+- `layout.mdc` — Studio Law G6/S2 detail
+- `shell/studio-windows.mdc` — DeskPane overflow bands
+- `architecture/semantic-html-css.mdc` — native tags + CSS layout laws
+- `design/layout.mdc` — section / container / bands (ideal-stack)
+- `design/design-system.mdc` — Studio Tailwind vs project `@theme`
+- `shell/chrome-css.mdc` — no CSS wars
+- ADR [0007](../../docs/adr/0007-natural-document-flow.md)

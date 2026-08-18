@@ -1,0 +1,82 @@
+{
+  "id": "automation",
+  "kind": "automation",
+  "version": "1.0.0",
+  "provider": "n8n",
+  "connection": {
+    "baseUrl": "https://workflows.glassboxcomputer.com",
+    "auth": {
+      "kind": "header",
+      "headerName": "Authorization",
+      "keyRef": "env:N8N_API_KEY"
+    }
+  },
+  "workflows": [
+    {
+      "id": "manual-test",
+      "title": "Manual / smoke test → Zulip",
+      "tags": ["smoke", "zulip"],
+      "events": ["workflow.manual"],
+      "enabled": true,
+      "n8n": {
+        "mode": "webhook",
+        "webhookPath": "/webhook/manual-test"
+      }
+    },
+    {
+      "id": "blog-publish",
+      "title": "Blog publish → Zulip",
+      "tags": ["blog", "publish", "zulip"],
+      "events": ["record.blog.published"],
+      "enabled": true,
+      "n8n": {
+        "mode": "webhook",
+        "webhookPath": "/webhook/blog-publish"
+      }
+    },
+    {
+      "id": "form-submitted",
+      "title": "Support form → Zulip",
+      "tags": ["forms", "zulip"],
+      "events": ["form.submitted"],
+      "enabled": false,
+      "n8n": {
+        "mode": "webhook",
+        "webhookPath": "/webhook/form-submitted"
+      }
+    },
+    {
+      "id": "message-gmail-inbound",
+      "title": "Gmail → Studio Messages",
+      "tags": ["messages", "inbox", "gmail", "email"],
+      "events": ["message.inbound"],
+      "enabled": true,
+      "n8n": {
+        "mode": "workflowId",
+        "workflowId": "3La5n931qr1pPFP8"
+      }
+    },
+    {
+      "id": "message-gmail-inbox-sync",
+      "title": "Gmail INBOX → Studio Messages (historical)",
+      "tags": ["messages", "inbox", "gmail", "email", "sync"],
+      "events": ["message.inbox.sync"],
+      "enabled": true,
+      "n8n": {
+        "mode": "webhook",
+        "webhookPath": "/webhook/gmail-inbox-sync"
+      }
+    }
+  ],
+  "inbound": {
+    "serviceTokenRef": "env:AGENT_STUDIO_AUTOMATION_TOKEN",
+    "allowedCollections": []
+  },
+  "dispatch": {
+    "analyticsForward": [],
+    "retry": {
+      "maxAttempts": 3,
+      "backoffMs": 1000
+    }
+  }
+}

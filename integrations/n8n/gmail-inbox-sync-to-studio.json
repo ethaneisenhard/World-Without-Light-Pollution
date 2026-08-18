@@ -1,0 +1,114 @@
+{
+  "name": "Studio Messages — Gmail inbox sync",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail-inbox-sync",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-inbox-sync",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "gmail-inbox-sync"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "returnAll": false,
+        "limit": 40,
+        "simple": true,
+        "filters": {
+          "q": "={{ $json.body && $json.body.q ? $json.body.q : ($json.q || 'in:inbox') }}",
+          "readStatus": "both",
+          "includeSpamTrash": false
+        },
+        "options": {}
+      },
+      "id": "gmail-get-all-inbox",
+      "name": "Gmail Get All",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [260, 0],
+      "notesInFlow": true,
+      "notes": "readStatus both — live inbound stays unread-only. Same Gmail OAuth as inbound."
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "gmail-get-sync",
+      "name": "Gmail Get",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [520, 0],
+      "notesInFlow": true,
+      "notes": "Simplify OFF — full text + HTML."
+    },
+    {
+      "parameters": {
+        "jsCode": "__GMAIL_INBOX_SYNC_NORMALIZE__"
+      },
+      "id": "normalize-inbox-sync",
+      "name": "Normalize Gmail envelope",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:3847/api/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $env.AS_HOST_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.envelope }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "post-studio-messages-sync",
+      "name": "POST Studio Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Gmail Get All", "type": "main", "index": 0 }]]
+    },
+    "Gmail Get All": {
+      "main": [[{ "node": "Gmail Get", "type": "main", "index": 0 }]]
+    },
+    "Gmail Get": {
+      "main": [[{ "node": "Normalize Gmail envelope", "type": "main", "index": 0 }]]
+    },
+    "Normalize Gmail envelope": {
+      "main": [[{ "node": "POST Studio Messages", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "description": "POST /webhook/gmail-inbox-sync { q } → Gmail INBOX (read+unread) → Studio Messages. Live inbound stays unread-only."
+}

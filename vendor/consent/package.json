@@ -1,0 +1,22 @@
+{
+  "name": "@glassbox-studio/consent",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Visitor consent API + privacy-prompt machine/entry. Adoptable by any Glass Box Studio project.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "xstate": "5"
+  },
+  "devDependencies": {
+    "happy-dom": "^20.10.6",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

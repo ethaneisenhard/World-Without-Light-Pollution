@@ -1,0 +1,106 @@
+---
+description: Kent/Kody state ladder + XState v5 for ALL client UI (incl. toggles/menus/busy) + pending/optimistic. Always on.
+alwaysApply: true
+---
+
+# UI state — ladder, XState, pending/optimistic (always on)
+
+**Golden sentence:** Server/URL state rides loaders and the URL; **everything else** in client UI — including single booleans, menus, `busy`, `open`, `mode` — lives in an **XState v5** actor. Mutating UI never waits silently: paint the **impending** state and prefer **optimistic** success until the server confirms.
+
+## State ladder (use highest row that fits)
+
+| Need | Use | Not |
+| --- | --- | --- |
+| Server / registry / files | Worker handler + `GET /api/*` | Client `useEffect` fetch on mount |
+| Route / project / path / open-set flags | **URL** search params or path (+ machine `URL_SYNCED`) | Hidden Handle-only source of truth |
+| Loader data per navigation | **Client route loader** (Kody `RouteLoader`) | Duplicate fetch in component |
+| Pending submit / optimistic (route forms) | Navigation / form submission state (Remix 3) | Manual `busy` boolean beside Remix |
+| **All other client UI state** (toggles, menus, modes, busy, streaming, panel mount, multi-surface) | **XState v5** machine + connector | Handle `let open = false` / `let busy = true` / coordinating booleans |
+| Handle role | Subscribe to actor → `handle.update()`; `queueTask` only for one-shot glue when no machine yet | Own product state in closure vars |
+
+## XState always (no "machine tax" carve-out)
+
+Every product UI state in Studio — including Nav/AI rail toggles, menus, `busy`, `open`, `mode`, and panel mount lifecycle — lives in an XState actor. Handle closure vars are **render scratch only**.
+
+| Include | Examples |
+| --- | --- |
+| Toggles / open flags | rail accordion, menu open, drawer, inspect on/off |
+| Modes | chat composer mode, viewport, editor surface, color mode |
+| Busy / pending / streaming | panel refresh, SSE turn, save, upload |
+| Multi-surface graphs | canvas tabs ↔ DeskPane ↔ URL; shell compact ↔ drawer |
+| Async graphs | project load, file open/save, chat sessions hydrate |
+| Mount lifecycle | trees portal, media/calendar/workflows bind keys |
+
+**Not product state (exceptions):**
+
+| OK outside machine | Why |
+| --- | --- |
+| Shareable open-set / route / path | **URL** is source of truth — machine emits/consumes `URL_SYNCED`; never Handle-only flags for shareable state |
+| `*-pure.ts` projections | Deterministic transforms — machine orchestrates, pure computes |
+| Persistence adapters | `*-store.ts` (localStorage) — machine invokes via connector actors |
+| True DOM-only scratch | Timer ids, ResizeObserver refs, one-frame focus ring with no chrome effect |
+
+**Forbidden:** `let fooOpen = false` / `let busy = true` / ad-hoc mode enums as the owner of product UI. If UI can desync, race, or be tested as a graph — it is a machine.
+
+### Shape
+
+```
+*-machine.ts       # pure createMachine — no DOM/fetch
+*-machine.test.ts  # actor + events → context / snapshot
+*-connector.ts     # .provide() I/O (DeskPane, localStorage, URL, fetch)
+*-api.ts           # deep public interface for hosts / plugins (optional)
+```
+
+Host imports **connector** (or API facade) only — never the raw machine from UI trees. UI projects `actor.getSnapshot()` (or connector `getState()`) then `handle.update()`. Plugins customize by **providing** machine actions/actors — not by forking `app.tsx`.
+
+```typescript
+export function StudioRoute(handle: Handle) {
+  const filesActor = createFilesPanelConnector({ /* deps */ })
+  filesActor.subscribe(() => handle.update())
+  return () => {
+    const { files, status } = filesActor.getSnapshot().context
+    const loading = status === "loading"
+    return (/* JSX using files, loading */)
+  }
+}
+```
+
+Side-effects live in machine connectors / loaders — not in pure modules. Do **not** park `loading` as a Handle `let`.
+
+## Pending + optimistic
+
+**Golden sentence:** Mutating UI never waits silently on the network — paint the **impending** (in-flight) state, and prefer **optimistic** success from intent/`formData` until the server confirms or rejects.
+
+| UX | Do | Don't |
+| --- | --- | --- |
+| **Pending / impending** | Show in-flight chrome (disabled control, frame fallback, machine `pending`/`submitting`) on every mutating action | Fire-and-forget with no visual change until response |
+| **Optimistic** | Default — render future state from submission intent / `formData` / machine context; rollback on failure | Manual `busy` boolean + blank wait as the only feedback |
+| **Pending-only OK** | No safe future state yet (upload %, unknown result shape) — still show progress / disabled | Spinner with no ownership of which action is in flight |
+
+Failed action → revert optimistic paint (error boundary, loader revalidation, or machine error transition). Never leave a lied-about success.
+
+### Who owns it
+
+| Surface | Owner | Not |
+| --- | --- | --- |
+| Forms, route navigations, frame loads | **Remix 3** — navigation / form submission state, frame pending fallbacks, `FormData` as optimistic source | Ad-hoc `let busy = true` clusters |
+| All Studio chrome UI (toggles, menus, panels, wizards, multi-surface) | **XState** — context holds **intent + pending** (and open/mode); connector does I/O | Separate `isSaving` / `*Open` flags beside or instead of the machine |
+| True DOM-only focus ring | Handle closure scratch OK | Owning menu/drawer/busy in Handle |
+
+XState does **not** replace Remix for simple route form submits. For every other graph, impending/optimistic live in that machine's context — don't bolt a second busy layer on the host.
+
+## Agent checklist (every UI edit)
+
+- [ ] New UI state → `*-machine.ts` (+ test) + connector; not a Handle `let`
+- [ ] No new `busy` / `*Open` / mode owned only in `app.tsx` or a host closure
+- [ ] Shareable flags still go through URL + machine sync
+- [ ] Host reads snapshot / connector API — does not mirror machine fields into parallel Handle lets
+- [ ] Every new mutating control has impending UI (and optimistic when a safe future state exists)
+- [ ] Rollback path exists (revalidate, error transition, or restore snapshot)
+
+## Related
+
+- `remix/remix-patterns.mdc` — ship bar (URL SoT, one-way paint, no heal-in-render)
+- `remix/ssr-no-flicker.mdc` — hydrate/list loading vs empty flash
+- `architecture/build-patterns.mdc` — pure + orchestrator; machine sits above pure
+- `docs/architecture/ideal-stack.md`

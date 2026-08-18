@@ -1,0 +1,78 @@
+{
+  "id": "welcome",
+  "label": "Welcome",
+  "subject": "Welcome to Northline, {{name}}",
+  "from": "hello@northline.local",
+  "audienceId": "all-subscribers",
+  "bodyText": "Hi {{name}},\n\nWelcome to Northline — glad you're here.\n\nWe'll send updates to {{email}}.\n\n— The Northline team",
+  "document": {
+    "root": {
+      "type": "EmailLayout",
+      "data": {
+        "backdropColor": "#F5F5F5",
+        "canvasColor": "#FFFFFF",
+        "textColor": "#262626",
+        "fontFamily": "MODERN_SANS",
+        "childrenIds": [
+          "block-heading",
+          "block-text",
+          "block-button",
+          "block-footer"
+        ]
+      }
+    },
+    "block-heading": {
+      "type": "Heading",
+      "data": {
+        "style": {
+          "padding": { "top": 32, "bottom": 8, "left": 24, "right": 24 },
+          "textAlign": "left"
+        },
+        "props": {
+          "text": "Welcome, {{name}}",
+          "level": "h2"
+        }
+      }
+    },
+    "block-text": {
+      "type": "Text",
+      "data": {
+        "style": {
+          "fontWeight": "normal",
+          "padding": { "top": 0, "bottom": 16, "left": 24, "right": 24 }
+        },
+        "props": {
+          "text": "Glad you're here. We'll send product updates to {{email}}."
+        }
+      }
+    },
+    "block-button": {
+      "type": "Button",
+      "data": {
+        "style": {
+          "padding": { "top": 8, "bottom": 24, "left": 24, "right": 24 },
+          "textAlign": "left"
+        },
+        "props": {
+          "text": "Open Studio",
+          "url": "https://example.com",
+          "buttonBackgroundColor": "#111827",
+          "buttonTextColor": "#FFFFFF"
+        }
+      }
+    },
+    "block-footer": {
+      "type": "Text",
+      "data": {
+        "style": {
+          "fontWeight": "normal",
+          "padding": { "top": 8, "bottom": 32, "left": 24, "right": 24 },
+          "color": "#737373"
+        },
+        "props": {
+          "text": "— The Northline team"
+        }
+      }
+    }
+  }
+}

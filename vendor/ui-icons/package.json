@@ -1,0 +1,31 @@
+{
+  "name": "@glassbox-studio/ui-icons",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Heroicons as remix/ui SVG factories — ported from BrowserUI glyph catalog (no React).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ssr": "./src/ssr.ts",
+    "./brand/glass-box-mark": "./src/brand/glass-box-mark.tsx",
+    "./24/outline": "./src/24/outline.ts",
+    "./24/outline/*": "./src/24/outline/*.ts",
+    "./24/solid": "./src/24/solid.ts",
+    "./24/solid/*": "./src/24/solid/*.ts"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "sync": "node scripts/sync-heroicons.mjs",
+    "generate": "node scripts/generate-named.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "remix": "3.0.0-beta.5"
+  },
+  "devDependencies": {
+    "remix": "3.0.0-beta.5",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

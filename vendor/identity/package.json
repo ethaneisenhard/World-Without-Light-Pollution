@@ -1,0 +1,18 @@
+{
+  "name": "@glassbox-studio/identity",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "First-party visitor + session identity (mint, cookie/field names). Adoptable by any Glass Box Studio project.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

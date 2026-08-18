@@ -1,0 +1,6 @@
+import type { DesignComponentMeta } from '@glassbox-studio/studio-core/browser';
+export const meta = { id: 'hero', title: 'Hero', layer: 'composite', acceptsChildren: false, props: { layout: { type: 'enum', values: ['center', 'split'], default: 'center', title: 'Layout' } }, slots: { eyebrow: { title: 'Eyebrow', optional: true }, title: { title: 'Title' }, subtitle: { title: 'Subtitle', optional: true }, ctaPrimary: { title: 'Primary CTA', optional: true }, ctaSecondary: { title: 'Secondary CTA', optional: true }, media: { title: 'Media', optional: true } } } as const satisfies DesignComponentMeta;
+export const slotTextDefaults = { eyebrow: 'Eyebrow', title: 'Hero title', subtitle: 'Hero subtitle', ctaPrimary: 'Primary action', ctaSecondary: 'Secondary action', media: '' } as const;
+export function slotsFromPlainText(text: Record<string, string>): Record<string, string> { return { eyebrow: text.eyebrow?.trim() || '', title: text.title?.trim() || 'Hero title', subtitle: text.subtitle?.trim() || '', ctaPrimary: text.ctaPrimary?.trim() || '', ctaSecondary: text.ctaSecondary?.trim() || '', media: text.media?.trim() || '' }; }
+export type { HeroProps, HeroSlots } from './hero.js';
+export { Hero, renderHero } from './hero.js';

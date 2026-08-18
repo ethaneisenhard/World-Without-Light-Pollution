@@ -1,0 +1,141 @@
+{
+  "name": "Studio Messages — Gmail outbound",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail-outbound",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "wh-gmail-outbound",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "gmail-outbound"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body ?? $input.first().json;\nconst to = String(body.to || '').trim();\nconst text = String(body.text || body.message || '').trim();\nconst subject = String(body.subject || 'Studio message').trim();\nconst threadId = String(body.threadId || '').trim();\nconst messageId = String(body.messageId || '').trim();\nif (!to) throw new Error('to required');\nif (!text) throw new Error('text required');\nreturn [{\n  json: {\n    to,\n    text,\n    subject,\n    threadId: threadId || null,\n    messageId: messageId || null,\n    useReply: Boolean(messageId),\n  },\n}];"
+      },
+      "id": "normalize-outbound",
+      "name": "Normalize outbound",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.useReply }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "if-reply",
+      "name": "Has messageId?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [460, 0]
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $json.messageId }}",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "id": "gmail-reply",
+      "name": "Gmail Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [700, -120],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yDlvMqIekqe1o4SO",
+          "name": "Studio Gmail v2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "threadId": "={{ $json.threadId || undefined }}"
+        }
+      },
+      "id": "gmail-send",
+      "name": "Gmail Send",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [700, 120],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "yDlvMqIekqe1o4SO",
+          "name": "Studio Gmail v2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json;\nconst id = String(raw.id || raw.messageId || '');\nconst threadId = String(raw.threadId || '');\nreturn [{ json: { ok: true, id, threadId } }];"
+      },
+      "id": "shape-response",
+      "name": "Shape response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [940, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1160, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Normalize outbound", "type": "main", "index": 0 }]]
+    },
+    "Normalize outbound": {
+      "main": [[{ "node": "Has messageId?", "type": "main", "index": 0 }]]
+    },
+    "Has messageId?": {
+      "main": [
+        [{ "node": "Gmail Reply", "type": "main", "index": 0 }],
+        [{ "node": "Gmail Send", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gmail Reply": {
+      "main": [[{ "node": "Shape response", "type": "main", "index": 0 }]]
+    },
+    "Gmail Send": {
+      "main": [[{ "node": "Shape response", "type": "main", "index": 0 }]]
+    },
+    "Shape response": {
+      "main": [[{ "node": "Respond", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "description": "Studio Messages composer → Gmail send/reply. POST /webhook/gmail-outbound { to, subject, text, threadId?, messageId? }"
+  },
+  "tags": [
+    { "name": "glassbox-studio" },
+    { "name": "messages" },
+    { "name": "gmail" }
+  ]
+}

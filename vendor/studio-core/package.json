@@ -1,0 +1,22 @@
+{
+  "name": "@glassbox-studio/studio-core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./browser": "./src/browser.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "marked": "^18.0.6"
+  }
+}

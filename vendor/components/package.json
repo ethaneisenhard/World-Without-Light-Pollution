@@ -1,0 +1,38 @@
+{
+  "name": "@glassbox-studio/components",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Glass Box Studio shared components — design registry (SSR) + remix/ui headless (Directory, …). Pass Tailwind class maps; no baked brand.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./registry": "./src/registry.ts",
+    "./directory": "./src/remix/directory/index.ts",
+    "./remix/directory": "./src/remix/directory/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@glassbox-studio/canvas-inspector": "workspace:*",
+    "@glassbox-studio/sandbox-engine": "workspace:*",
+    "@glassbox-studio/studio-core": "workspace:*",
+    "@glassbox-studio/ui-icons": "workspace:*"
+  },
+  "peerDependencies": {
+    "remix": "3.0.0-beta.5"
+  },
+  "peerDependenciesMeta": {
+    "remix": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "happy-dom": "^20.10.6",
+    "remix": "3.0.0-beta.5",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

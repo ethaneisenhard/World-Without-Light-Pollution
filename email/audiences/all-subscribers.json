@@ -1,0 +1,8 @@
+{
+  "id": "all-subscribers",
+  "label": "All subscribers",
+  "filter": {
+    "type": "roles",
+    "roles": ["subscriber", "lead"]
+  }
+}

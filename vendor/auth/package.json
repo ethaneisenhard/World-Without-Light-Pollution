@@ -1,0 +1,27 @@
+{
+  "name": "@glassbox-studio/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./webauthn-host-pure": "./src/webauthn-host-pure.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@glassbox-studio/components": "workspace:*",
+    "@glassbox-studio/ui-icons": "workspace:*",
+    "@cloudflare/workers-oauth-provider": "^0.8.1",
+    "@simplewebauthn/browser": "^13.0.0",
+    "@simplewebauthn/server": "^13.0.0",
+    "remix": "3.0.0-beta.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.8.3",
+    "vitest": "^3.0.0"
+  }
+}

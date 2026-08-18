@@ -1,0 +1,62 @@
+---
+description: Constitution — native tags + data-*; HTML/CSS layout only; dual DOM faces for drastic responsive (never JS layout)
+alwaysApply: true
+---
+
+# Semantic HTML & CSS layout (always on)
+
+**Owns:** non-negotiable markup + layout laws for **Studio chrome and ideal-stack**.  
+**Does not own:** Inspect attr schema detail, section/band taste, Studio class names — those are linked below.
+
+## Laws
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **Native tags** — landmarks/controls are real HTML | Decorative `div`/`span` soup; `<div onclick>` |
+| 2 | **Stamp `data-*`** — registry/chrome identity on attrs | Identity only in class names or text |
+| 3 | **Layout = HTML + CSS** | JS measures/positions/flows everyday UI |
+| 4 | **Drastic responsive = two hardened trees** | One component reshaped by `isMobile` / width JS |
+
+## Layout: CSS only
+
+| Do | Don't |
+| --- | --- |
+| Flex, grid, container queries, Tailwind responsive | `getBoundingClientRect` → set `top`/`left`/`width` for normal layout |
+| CSS show/hide (`hidden`, `@max-[…]`, `data-shell-compact`) | Mount A vs B from measured width for first-paint chrome |
+| Document flow; sticky/fixed sparingly for product chrome | Measure→reflow loops, portal hacks, `textContent` face swaps |
+| Natural size + `flex-1` / grid `1fr` fill | `min-w-0` / `min-h-0`, casual `h-full`, leaf `max-w-*` clamps — `design/natural-document-flow.mdc` |
+
+**Exception:** real geometry hosts (DeskPane / canvas) may observe size — that is **not** permission to build marketing or chrome layout in JS.
+
+## Drastic desktop ↔ mobile
+
+Different **structure** (not font/gap/columns) → **both** components in the DOM; CSS shows one.
+
+```tsx
+// ✅
+<div class="desktop-only" data-as-component="foo-desktop">…</div>
+<div class="mobile-only" data-as-component="foo-mobile">…</div>
+
+// ❌
+{isMobile ? <FooMobile /> : <FooDesktop />}
+```
+
+Single-tree OK for spacing/type/simple hide of icon vs label. Studio face class names: `shell/chrome-css.mdc`.
+
+## Agent checklist (every UI edit)
+
+- [ ] Right landmark / control tag
+- [ ] `data-*` on component (+ slots when registry)
+- [ ] No new JS layout / width→tree branching
+- [ ] Structure change across breakpoints → dual mount + CSS
+
+## Detail rules (do not duplicate here)
+
+| Need | Rule |
+| --- | --- |
+| `data-as-*` stamp table + Tailwind-on-tag | `design/tokens-and-markup.mdc` |
+| `section → container → content` / bordered surfaces | `design/layout.mdc` |
+| CSS document-flow (general G1–G10 + Studio S1–S5) | `design/natural-document-flow.mdc` · ADR 0007 |
+| Studio dual-face class hooks (`studio-canvas-*-only`) | `shell/chrome-css.mdc` |
+| Pane container queries | `shell/studio-windows.mdc` |
+| Slots vs props | `design/components.mdc` |

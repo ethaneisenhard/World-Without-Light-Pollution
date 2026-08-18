@@ -1,0 +1,7 @@
+{
+  "id": "mail-send",
+  "kind": "mail-send",
+  "label": "Mail send (Cloudflare Email)",
+  "capabilities": ["mail-send"],
+  "notes": "Studio Node uses CF Email Sending REST when providers.email = email-cloudflare + env secrets."
+}

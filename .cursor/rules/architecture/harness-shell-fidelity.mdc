@@ -1,0 +1,51 @@
+---
+description: Studio is a shell — peer harnesses own the loop; chrome shows the real harness
+globs: apps/studio/**/*,packages/studio/**/*,docs/architecture/harness*
+alwaysApply: true
+---
+
+# Harness shell fidelity (always on)
+
+**Golden sentence:** Studio is the **shell** (chrome, MCP, review, spawn). Peer harnesses (**cursor** / **hermes** / **grok** / **kody** / …) own their **own** agent loop. Fidelity target = that peer’s **Host CLI** (or cloud API), not Cursor IDE and not a second Anthropic progressive-tool loop inside the peer turn.
+
+## Three “Kody”s (do not confuse)
+
+| Name | What it is |
+| --- | --- |
+| Remix / Kody **frontend** | Worker + `remix/ui` — UI shape for Studio + ideal-stack |
+| `harness: kody` | Optional cloud plug (`KODY_CHAT_URL`) on the same `runTurn` socket |
+| “Kody-shaped” studio | Bootstrap metaphor for default `harness: studio` — **not** “run Kody’s loop inside peers” |
+
+## Laws
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **Peers heavy-lift** — Host CLI / peer API runs the turn | Peer adapter reimplements Anthropic tool-round thrash for Cursor/Hermes/Grok |
+| 2 | **Studio = shell** — spawn, ContextBundle, MCP inject, Keep/Approve, SSE paint | Studio silently hijacks peer turns with its own progressive catalog loop |
+| 3 | **Chrome tells truth** — footer / chips / turn labels show selected or effective harness | Hardcoded `harness: studio` while picker is `grok` / `cursor` / … |
+| 4 | **Parity = Host CLI** — same flags / MCP / login the CLI needs on Host | Expecting full IDE embed or Studio-only shortcuts as the peer’s brain |
+| 5 | **Vision via connectors** — Host prepare (`native` / `files` / `mcp-vision` / `unsupported`); never silent harness hijack | Image turn silently flips to `studio` |
+
+## Do / Don't
+
+| Do | Don't |
+| --- | --- |
+| One `runTurn` socket; adapter = transport | Fork a parallel “Studio brain” inside peer adapters |
+| Inject Studio MCP into peer config (`.cursor/mcp.json`, Hermes yaml, `.grok/config.toml`) | Freestyle-edit Studio UI files instead of MCP chrome tools |
+| Footer / activity: `liveHarnessId` when streaming (SSE `status.harnessId`), else picker `chatHarness` | Hardcode `"studio"` in shell chrome |
+| New peer = Host CLI (or documented API) + `harness-*-orchestrator` + allowlist row | xAI HTTP API as a fake “Grok” peer when product means Grok Build CLI |
+| Capability prepare in Host connector registry | Adapters invent prepare policy; silent image→studio redirect |
+
+## Agent checklist
+
+- [ ] Peer turn path does **not** call Studio Anthropic progressive tools for that harness id
+- [ ] New chrome status shows real harness id (picker and/or SSE effective)
+- [ ] Docs / allowlists name the Host CLI binary and install path
+- [ ] Vision / prepare stays in Host connector registry — adapter stays transport; no hijack
+
+## Related
+
+- `docs/architecture/harness-orchestration.md` — dual model + shell contract
+- `docs/architecture/harness-capability-prepare.md` — Host prepare
+- `build-patterns.mdc` — pure + orchestrator seams
+- `build-patterns.mdc` — UI ↔ CLI ↔ API one stack

@@ -1,0 +1,123 @@
+---
+description: Layout hierarchy (section→container→content) + Studio grid/flex policy — section owns band, container owns width, panes flex-scroll. Always on.
+alwaysApply: true
+---
+
+# Layout (ideal-stack hierarchy + Studio grid/flex)
+
+**Owns:** `section → container → content` band model for ideal-stack, and the Studio detail for Law G6 + policy S2 in `natural-document-flow.mdc`. **Laws** (native tags, stamps, no JS layout): `architecture/semantic-html-css.mdc`.
+
+## Golden sentences (ideal-stack)
+
+1. **Compose** `section → container → content` (primitives / composites / buttons).
+2. **Section owns the band** — full-bleed background + **side and vertical padding** (gutters).
+3. **Container owns width** — parent track / align (prefer grid/`1fr` + padding). Not page gutters, not band color. **Do not** add leaf `max-w-*` / `min-w-0` clamps — `natural-document-flow.mdc` / ADR 0007.
+4. **Flex / Grid own layout flow** — row/col/gap/columns + grow (`flex-1` / `1fr`). Not page spacing; not `h-full` by default.
+5. **Everything else** = primitives (heading, text, button, …) or composite **slots**.
+6. **Painted inset surface** (bg on a box that is not the band) → **border + radius + inset padding**. Never a naked fill.
+
+### Who owns what
+
+| Layer | Owns | Never |
+| --- | --- | --- |
+| **`section`** | Band `background`, **padding (sides + top/bottom)**, landmark `<section>` | Content max-width; stuffing CTAs as raw HTML without primitives |
+| **`container`** | Align + participate in parent width (grid/flex) | Side/page gutters; page-band background; unbordered filled "cards"; new `max-w-*` layout clamps |
+| **`flex` / `grid`** | Direction, wrap, gap, columns / tracks / grow | Page band padding; leaf max-width shells; `min-w-0` / casual `h-full` |
+| **`card` / inset panel** | Surface fill **with** `border-line` + `rounded-xl` (or `lg`) + inset padding | Bare `bg-paper-raised` with no edge |
+| **Composites** (`blog-hero`, …) | Editorial structure + slots (+ layout knobs) | Site chrome `<header>` / `<footer>`; owning page max-width or page gutters |
+
+```html
+<section data-as-component="section" …>           <!-- band + gutters -->
+  <div data-as-component="container" …>         <!-- width via parent track / align -->
+    <section data-as-component="blog-hero" …>   <!-- composite / slots -->
+```
+
+### Background taste
+
+| Situation | Rule |
+| --- | --- |
+| Full-width page band | Set `background` on **`section`** only (`muted` → `bg-sand`, `surface` → `bg-paper-raised`, `brand` → `bg-accent`) |
+| Transparent band | `section` `background: transparent` — page `bg-paper` shows through |
+| Side / vertical rhythm | **`section` `padding`** (default includes `px-4 md:px-8`) — not Container, not composites |
+| Inset panel / "card" look | Raised fill **only if** paired with **`border border-line`**, **`rounded-xl`** (or `lg`), and **padding** |
+| Container with fill, no border | **Forbidden** — reads like a broken floating slab |
+
+### Copy alignment
+
+| Mode | Container | Copy |
+| --- | --- | --- |
+| Left stack (default) | `align: left` | left |
+| Center stack | `align: center` | center **every** copy block / CTA row |
+
+Never center the width box while leaving title/CTAs left-aligned inside (floating-left-in-a-centered-box).
+
+### Footer & chrome
+
+- Full-width footer **band** = wrapping **`section`** (`background: muted`). Semantic `<footer>` inside = links/chrome only — **no** band fill on the footer tag itself.
+- Site top bar stays `<header>` (nav) — never reuse that landmark for `blog-hero`.
+
+### Motion (restrained)
+
+≤1 delight beat per section; ≤2 motion sources per page when adding animation. Prefer `prefers-reduced-motion` respect.
+
+## Shell grid / flex content (Studio chrome)
+
+**Audience:** primarily **Studio chrome** (`apps/studio/**`). Ideal-stack uses the **general** Law G6 in `natural-document-flow.mdc` (2D skeletons OK on marketing/components) — not this shell-first tightening.
+
+**Golden sentence:** In Studio product chrome, **grid is for shell / stage tracks** (and rare true 2D tools). **Content panes use the pane recipe** (`flex-col` + one scroll leaf). Never use content `grid` to "fix" truncation.
+
+| Layer | Tool | Examples |
+| --- | --- | --- |
+| **Shell** | CSS **grid** OK once | `data-shell-body` columns; main `auto`/`1fr` stage |
+| **Pane / column** | Law G3 — `flex flex-col overflow-hidden` + `flex-1 overflow-y-auto` | Left AI rail, chat column, settings body, recents rail |
+| **Row chrome** | **One** `flex` / `inline-flex` | Session tabs, avatar + bubble turn, toolbar, list row |
+| **Copy / MD** | **block** | Bubbles, prose, lists — no grid |
+| **2D chrome tools** | Component **grid** OK | Design atlas, true multi-track inspectors — not lists |
+
+```
+shell grid (body)
+  └─ pane flex-col overflow-hidden
+       ├─ header / tabs   shrink-0
+       ├─ scroll body     flex-1 overflow-y-auto
+       └─ footer          shrink-0
+            └─ content: flex peer-row → block prose
+```
+
+### Forbidden (Studio G6 + S2 + G10)
+
+| Don't | Why |
+| --- | --- |
+| `grid` + `grid-rows-[auto_1fr_auto]` inside a grid cell for chat/settings/lists | Nested tracks fight; children expand past the cell |
+| Content `grid-cols-1` "to force width / truncate" | Escape hatch — use Law G5 / Studio truncate recipe |
+| Grid "for consistency" on every nested host | Flex column fills leftover without a second track graph |
+| Content `grid` whose children also `grid` for fill | Overflow / double min-size traps |
+
+### Prefer flex for panes (Law G3)
+
+| Need | Use |
+| --- | --- |
+| Tabs + filling log + composer | Parent `flex flex-col overflow-hidden`; log `flex-1 overflow-y-auto` |
+| Narrow rail list + ellipsis titles | Law G5 / Studio S1 — row `overflow-hidden` + title `truncate` |
+| Avatar beside bubble | Turn `flex`; sharing child `flex-1` + overflow |
+| Shell body left / main / right | **One** body grid — panes inside are flex |
+
+Shell `overflow-hidden` on the flex column so `flex-1` children can shrink and scroll — prefer overflow, not `min-w-0` / `contain-inline-size` (Studio S1). CQ `@container` on panes remains OK.
+
+## Checklist
+
+- [ ] `section` owns band + gutters; `container` owns width (no leaf `max-w-*` clamps)
+- [ ] Bordered inset surfaces have border + radius + padding (no naked fill)
+- [ ] Copy alignment matches container mode (no floating-left-in-centered-box)
+- [ ] New fill layout in a rail/pane → Law G3 flex recipe, not nested `grid-rows`
+- [ ] `grid` only if this node is a **shell/stage** band or a documented **2D chrome tool**
+- [ ] Truncate failures → G5 / S1, not content grid
+- [ ] Ideal-stack 2D marketing → general G6 in `natural-document-flow.mdc`
+
+## Related
+
+- `design/natural-document-flow.mdc` — general G1–G10 + Studio S1–S5 (law book)
+- `design/surfaces.mdc` — border / radius / inset / ink (surface detail)
+- `design/tokens-and-markup.mdc` — `data-as-*` stamps
+- `shell/studio-windows.mdc` — DeskPane overflow bands
+- `shell/chrome-css.mdc` — no CSS wars to force fill
+- Lesson: left-rail chat nested `grid-rows-[auto_1fr_auto]` inside shell body grid → broken fill; fixed with `SHELL_CHAT_COLUMN_RAIL` flex-col

@@ -1,0 +1,208 @@
+---
+description: Design component recipes — slots over props, Heroicons only, inputs ≥16px, drawers X-only, create-new collapsed, stable tabs, pager. Always on.
+alwaysApply: true
+---
+
+# Design components & control recipes (always on)
+
+**Golden sentences:** Props = knobs; **slots = content**. Icons are Heroicons only. Interactive fields ≥16px. Drawers close with X only. Create-new forms start collapsed. Tabs reserve their indicator. The bottom pager is meta-left + actions-right.
+
+---
+
+## Slots vs props (ideal-stack registry)
+
+Ask: *Could an author swap this for another component or edit it as its own Inspect target?*
+
+| Yes → **slot** | No → **prop** |
+| --- | --- |
+| Title, subtitle, eyebrow, byline, cover, CTA | `layout`, `variant`, `padding`, `width`, `align`, `gap` |
+| Button / link / figure as children | Booleans, enums, numeric scales |
+
+**At most ~2 content-shaped concerns as raw string props** before splitting into slots or child primitives. CTAs are **Button primitives in slots** (`ctaPrimary` / `ctaSecondary`) — not byline HTML soup.
+
+```ts
+// ✅ props = knobs · slots = content / primitives
+meta: {
+  props: { layout: { type: "enum", values: ["magazine", "side", "backdrop"], … } },
+  slots: { title, subtitle, eyebrow, byline, ctaPrimary, ctaSecondary, cover },
+}
+// ❌ content as scalar props — invisible to Inspect tree as components
+props: { title: string, ctaLabel: string, ctaHref: string, imageUrl: string }
+```
+
+### Tree / Inspect navigable
+
+| Do | Don't |
+| --- | --- |
+| Compose Live pages: `section → container → primitives/composites` | One site mega-component hiding all copy in one render |
+| Stamp `data-as-component` / `data-as-slot` on every registry piece | Raw `<a class="nl-cta">` with no Button primitive |
+| Promote repeated patterns into `design/components/` | `if (projectId === …)` one-offs |
+| Nested primitives stay selectable (Button inside CTA slot) | Merge slot attrs onto a child that already has `data-as-component` |
+
+Styling: utilities on the semantic tag; theme colors (`bg-paper`, `text-ink`, `border-line`, `bg-accent`) — not raw hex / `bg-zinc-*` / `dark:` palette hacks. Headless primitives accept `className` from compose; don't bake brand into shared defaults.
+
+---
+
+## Icons — Heroicons only
+
+**Golden sentence:** Studio chrome and ideal-stack UI icons come from **`@glassbox-studio/ui-icons`** (Heroicons outline/solid, remix/ui SVG factories). Emoji, unicode dingbats, and one-off hand-drawn `<svg>`/`path` icons = fail ship bar.
+
+| Import | Use |
+| --- | --- |
+| `@glassbox-studio/ui-icons/24/outline/<name>` | Tree-shaken chrome icons (prefer) |
+| `@glassbox-studio/ui-icons/24/solid/<name>` | Filled / active state |
+| `@glassbox-studio/ui-icons` → `viewportIcon`, `heroIcon` | Live viewport chips; dynamic kebab names |
+| `@glassbox-studio/ui-icons/ssr` → `moonOutlineSvg`, `glassBoxMarkSvgHtml`, … | String HTML / Worker SSR |
+
+Catalog is vendored — `pnpm --filter @glassbox-studio/ui-icons sync` if Heroicons need refresh. Do **not** scrape ad-hoc SVGs into `apps/studio` or ideal-stack.
+
+Factories return SVG vnodes — **call** them, don't mount as Handle components:
+
+```tsx
+import { XMarkIcon } from "@glassbox-studio/ui-icons/24/outline/x-mark";
+<button type="button" aria-label="Close">{XMarkIcon({ class: "size-4 shrink-0" })}</button>
+
+// ❌ emoji / hand-rolled
+<span>⚙</span> <span>×</span> <span>☰</span>
+<svg viewBox="0 0 24 24"><path d="M…" /></svg>
+```
+
+**Exceptions (not "icons"):** multiplication sign in dimensions (`800×600`); checkmark in a plain-text status string; project content / marketing illustration; **Glass Box product mark** (`GlassBoxMarkIcon` / `glassBoxMarkSvgHtml` only — never `<img>` or forked SVG in chrome).
+
+---
+
+## Input font size ≥16px
+
+**Golden sentence:** Every interactive text field (`input`, `textarea`, `select`) uses **`font-size ≥ 16px`** (`text-[16px]` or larger). Smaller type on labels/chips/buttons is fine — focused form controls are not (iOS Safari zooms the viewport under 16px).
+
+| Do | Don't |
+| --- | --- |
+| `text-[16px]` (or larger) on `input` / `textarea` / `select` | `text-[12px]` / `text-sm` / `text-xs` on those controls |
+| Reuse `INPUT_TEXT_BASE` / shared field constants in `studio-ui-*.ts` | One-off small font on a new search/composer/reply field |
+
+Ideal-stack: same floor on project form controls — theme may scale larger, never smaller than 16px for typed fields.
+
+---
+
+## Drawer / sheet close — X only (no grabber)
+
+**Golden sentence:** Studio drawers and bottom sheets **never** paint a top drag handle / grabber / "touch handlebar." Close is the **X** in the header (plus scrim / Escape where wired).
+
+```
+<dialog / sheet>
+  <header>          ← title + X only
+  <body>            ← content
+```
+
+| Do | Don't |
+| --- | --- |
+| Title + X close in the header row | `h-1 w-10 rounded-full` grabber above the header |
+| Reuse `MOBILE_SHEET_HEADER` + `MOBILE_SHEET_CLOSE` (or chat settings twins) | Decorative `::before` / `aria-hidden` pill "handle" |
+| Scrim / Escape as secondary dismiss | Grabber as the primary close signal |
+
+**Forbidden:** touch handlebar node (`SHELL_CHAT_SETTINGS_HANDLE`, `mx-auto mt-2 h-1 w-10 rounded-full`); CSS grabber pseudo; Vaul-style drag pill with no real drag. **Not this rule:** pane **resize** handles (`SHELL_RESIZE_HANDLE`) — splitters, not drawer dismiss chrome.
+
+---
+
+## Create-new — collapsed until click
+
+**Golden sentence:** Create-new **forms** stay closed. Fields appear only after **Create new**. Never paint empty create fields as the default face.
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **Closed default** | Name / harness / id fields visible on first paint |
+| 2 | **Create new = toggle** | Same button submits while fields already showing |
+| 3 | **Submit in the open panel** | No footer Create / Save once the form is open |
+| 4 | **XState owns `open`** | Handle `let createOpen` / coordinating boolean |
+| 5 | **Success closes** | Panel stays open after a successful create |
+
+`Create new` is `type="button"` + `aria-expanded` + `aria-controls`. Submit is a **second** control in `SETTINGS_GROUP_FOOTER` (`SETTINGS_BTN_PRIMARY`). Faces: Settings → `SETTINGS_BTN` "Create new" + chevron → `SETTINGS_GROUP` fields; Directory → full-width `DATA_GRID_BTN` + Plus. Canonical: `apps/studio/client/create-new/create-new-disclosure-view.tsx`.
+
+**Instant create (no fields):** button may fire immediately (New note, New chat) — **no** fake dropdown. This rule is for forms that need input.
+
+---
+
+## Tab underline — no layout shift
+
+**Golden sentence:** Underline / bottom-indicator tabs **always** reserve the indicator thickness — idle = transparent (or matching track), active = brand. Switching tabs must **not** change row height or shove content. Section tab strips also leave **clear air below** the track.
+
+| State | Use |
+| --- | --- |
+| Idle | `TAB_UNDERLINE` — `border-b-2 border-b-transparent` (sides/top 0) |
+| Active | `TAB_UNDERLINE_ACTIVE` — same width, `border-b-brand-600` |
+| Section strip | `SECTION_TABS` / `SECTION_TAB` / `SECTION_TAB_ACTIVE` |
+
+```ts
+// ✅ same geometry both states — color only
+class={active ? ui.SHELL_RAIL_TREE_TAB_ACTIVE : ui.SHELL_RAIL_TREE_TAB}
+// ❌ width only on active
+class={active ? "border-b-2 border-brand-600" : "border-b-0"}
+```
+
+| Do | Don't |
+| --- | --- |
+| Always `border-b-2` (or fixed `h-*` underline via `::after` / inset shadow) on **every** tab | Idle with no bottom border / `border-b-0` |
+| Idle `border-b-transparent`; active brand | Toggle border **width** between states |
+| `box-border`; keep font-weight / padding identical across states | Pair `border-0` with `border-b-2` — shorthand can zero the reserved edge |
+
+### Below the strip (section tabs)
+
+| Relationship | Min gap | Tailwind | Token |
+| --- | --- | --- | --- |
+| Window chrome → tab track | **12px** | `pt-3` on strip | `space.3` |
+| Tab track → first content section | **12px** | `mb-3` on strip (or `pt-3` on content) | `space.3` |
+| Comfort / dense chrome | 16px | `mb-4` / `pt-4` | `space.4` |
+
+Keep gap on the **strip or the content start** — one owner. Rail/dock underlines that sit flush in a chrome band don't force `mb-3` — only **section strips**. Alternatives (also no-shift): `::after` absolute bar, inset `box-shadow`, or full-row track `border-b` + active overlay.
+
+---
+
+## Table / directory footer pager
+
+**Golden sentence:** A bottom pager row is **two peers** — status meta on the left, a **single actions cluster** (Prev/Next) on the right — with **horizontal inset that clears the rounded shell**.
+
+```
+<footer / div.DIRECTORY_PAGER>          ← flex justify-between items-center px-3.5 py-2
+  <span.DIRECTORY_PAGER_META>           ← Page N of M
+  <div.DIRECTORY_PAGER_ACTIONS>         ← inline-flex gap-1.5
+    <button>Prev</button>
+    <button>Next</button>
+```
+
+| Slot | Constant (Studio) | Role |
+| --- | --- | --- |
+| Row | `DIRECTORY_PAGER` | `justify-between` + `px-3.5` + balanced `py-2` + `items-center` |
+| Meta | `DIRECTORY_PAGER_META` | Page label — left |
+| Actions | `DIRECTORY_PAGER_ACTIONS` | Prev/Next **group** — right |
+
+Inside a **rounded** table/card (`DATA_GRID` = `rounded-xl`, or any `rounded-*` + `overflow-hidden` shell): match body/toolbar horizontal gutter (`px-3.5` on Studio `DATA_GRID`); keep inset ≥ corner radius. `rounded-xl` ≈ 12px → `px-3.5` (14px) is the Studio floor.
+
+| Do | Don't |
+| --- | --- |
+| Two flex children under `justify-between` | Meta + Prev + Next as three siblings |
+| `flex-row` always — compact meta + icons under `@container` narrow | `flex-wrap` / `flex-col` (stacked regression) |
+| `items-center` + `px-3.5 py-2` (balanced) | `pt-3` only / uneven vertical pad / no `px` |
+| Group Prev/Next with `gap-1` / `gap-1.5` | Stretch Prev into the empty middle |
+
+Chrome component: `studioPager` + `PAGER_*` in `@glassbox-studio/ui-components`. Shared directory slots: `pager` / `pagerMeta` / `pagerActions`.
+
+---
+
+## Agent checklist (new/touched component)
+
+- [ ] Content is slots (or child primitives); props are knobs only
+- [ ] Classes are Tailwind + `@theme`; token score high (no raw hex/palette)
+- [ ] New control uses `@glassbox-studio/ui-icons` factory; no emoji / inline SVG paths
+- [ ] New field uses ≥16px; no `text-[1[0-5]px]` on `input` / `textarea` / `select`
+- [ ] No grabber div / pseudo above a drawer header; header has title + X
+- [ ] Create-new: first paint = title/hint + Create new only; `open` on a machine; success closes
+- [ ] Underline tabs: idle + active share indicator thickness; section strips ≥12px air below
+- [ ] Pager: exactly meta + actions wrapper; `px-*` clears rounded corners
+
+## Related
+
+- `design/layout.mdc` — section → container → content; bordered fills
+- `design/surfaces.mdc` — border / radius / inset (rounded shells)
+- `design/tokens-and-markup.mdc` — `data-as-*` stamps + `@theme`
+- `design/design-system.mdc` — Studio `@glassbox-studio/ui-*` packages + `studio-ui-*.ts`
+- Skill: `.cursor/skills/engineering/studio-primitive-ux/SKILL.md` — Settings recipe + footer token

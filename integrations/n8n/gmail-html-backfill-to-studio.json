@@ -1,0 +1,116 @@
+{
+  "name": "Studio Messages \u2014 Gmail HTML backfill",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "gmail-html-backfill",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-backfill",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "gmail-html-backfill"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.body.gmailMessageId || $json.gmailMessageId }}",
+        "simple": false,
+        "options": {}
+      },
+      "id": "gmail-get-backfill",
+      "name": "Gmail Get",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        260,
+        0
+      ],
+      "notesInFlow": true,
+      "notes": "Attach same Gmail OAuth as inbound. Simplify OFF."
+    },
+    {
+      "parameters": {
+        "jsCode": "function parseFrom(raw) {\n  if (raw == null) return { name: 'Unknown', address: 'unknown' };\n  if (typeof raw === 'object' && !Array.isArray(raw)) {\n    if (Array.isArray(raw.value) && raw.value[0]) return parseFrom(raw.value[0]);\n    if (typeof raw.text === 'string' && raw.text.trim()) {\n      const fromText = parseFrom(raw.text);\n      if (fromText.address !== 'unknown') return fromText;\n    }\n    const address = String(raw.address || raw.email || '').trim();\n    let name = String(raw.name || raw.displayName || '').trim();\n    if (!name || name === '[object Object]') name = '';\n    if (address) return { name: name || address, address };\n    if (name) return { name, address: name.includes('@') ? name : 'unknown' };\n  }\n  const s = String(raw || '').trim();\n  if (!s || s === '[object Object]') return { name: 'Unknown', address: 'unknown' };\n  const m = s.match(/^\\s*(.*?)\\s*<([^>]+)>\\s*$/);\n  if (m) {\n    const name = m[1].replace(/^[\"']|[\"']$/g, '').trim() || m[2];\n    return { name, address: m[2].trim() };\n  }\n  if (s.includes('@')) return { name: s, address: s };\n  return { name: s, address: s };\n}\n\nfunction decodeB64Url(data) {\n  if (!data || typeof data !== 'string') return '';\n  try {\n    const pad = data.length % 4 === 0 ? '' : '='.repeat(4 - (data.length % 4));\n    const b64 = data.replace(/-/g, '+').replace(/_/g, '/') + pad;\n    return Buffer.from(b64, 'base64').toString('utf8');\n  } catch {\n    return '';\n  }\n}\n\nfunction walkParts(part, acc) {\n  if (!part || typeof part !== 'object') return;\n  const mime = String(part.mimeType || '').toLowerCase();\n  const data = part.body?.data;\n  if (data && mime === 'text/plain' && !acc.text) acc.text = decodeB64Url(data);\n  if (data && mime === 'text/html' && !acc.html) acc.html = decodeB64Url(data);\n  if (Array.isArray(part.parts)) {\n    for (const child of part.parts) walkParts(child, acc);\n  }\n}\n\nfunction extractBodies(full) {\n  let text = String(full.text || full.textPlain || full.snippet || full.body || '').trim();\n  let html = String(full.html || full.textAsHtml || full.textHtml || full.bodyHtml || '').trim();\n  const payload = full.payload;\n  if (payload && typeof payload === 'object') {\n    const acc = { text: '', html: '' };\n    if (payload.body?.data) {\n      const mime = String(payload.mimeType || '').toLowerCase();\n      const decoded = decodeB64Url(payload.body.data);\n      if (mime === 'text/html') acc.html = decoded;\n      else if (mime === 'text/plain') acc.text = decoded;\n    }\n    walkParts(payload, acc);\n    if (!text && acc.text) text = acc.text.trim();\n    if (!html && acc.html) html = acc.html.trim();\n  }\n  return { text, html };\n}\n\nconst hook = $('Webhook').first().json;\nconst full = $input.first().json;\nconst { text, html } = extractBodies(full);\nconst gmailMessageId = String(\n  hook.body?.gmailMessageId || hook.gmailMessageId || full.id || ''\n);\nconst studioMessageId = String(\n  hook.body?.studioMessageId || hook.studioMessageId || ''\n).trim();\nconst subject = String(full.Subject || full.subject || '').trim();\nconst threadId = String(full.threadId || full.id || gmailMessageId);\nconst bodyText = subject\n  ? (text ? `Subject: ${subject}\\n\\n${text}` : `Subject: ${subject}`)\n  : (text || '(empty email)');\n\nif (!html) {\n  return [{ json: { ok: false, error: 'no html from Gmail', gmailMessageId } }];\n}\n\nconst envelope = {\n  conversationId: `email:thread:${threadId}`,\n  channel: 'email',\n  direction: 'in',\n  from: parseFrom(full.From || full.from),\n  body: { text: bodyText, html },\n  status: 'read',\n  meta: { gmailMessageId, gmailThreadId: threadId, subject },\n};\n\nreturn [{\n  json: {\n    ok: true,\n    gmailMessageId,\n    studioMessageId,\n    htmlLen: html.length,\n    envelope,\n  },\n}];"
+      },
+      "id": "normalize-backfill",
+      "name": "Normalize HTML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:3847/api/messages",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.envelope }}",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "post-upsert",
+      "name": "POST Studio upsert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Gmail Get",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Get": {
+      "main": [
+        [
+          {
+            "node": "Normalize HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize HTML": {
+      "main": [
+        [
+          {
+            "node": "POST Studio upsert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "description": "POST /webhook/gmail-html-backfill { gmailMessageId } \u2192 fetch full HTML (simple:false) \u2192 upsert Studio message"
+}

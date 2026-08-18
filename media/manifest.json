@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "id": "media_mrgp0gz7_25we7y",
+      "filename": "note.txt",
+      "contentType": "text/plain",
+      "bytes": 8,
+      "alt": "",
+      "tags": [],
+      "createdAt": 1783794204403,
+      "updatedAt": 1783794204403,
+      "storageKey": "media_mrgp0gz7_25we7y_note.txt"
+    },
+    {
+      "id": "media_mrjzpxn6_p3sc5c",
+      "filename": "hvt-probe.txt",
+      "contentType": "text/plain",
+      "bytes": 5,
+      "alt": "",
+      "tags": [],
+      "createdAt": 1783993587090,
+      "updatedAt": 1783993587090,
+      "storageKey": "media_mrjzpxn6_p3sc5c_hvt-probe.txt"
+    }
+  ]
+}

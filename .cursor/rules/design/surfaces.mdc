@@ -1,0 +1,124 @@
+---
+description: Surfaces — no box-shadow elevation, ink/hairline follow surface hue, peer sections ≥8px gap, rounded shells inset ≥ radius. Always on.
+alwaysApply: true
+---
+
+# Surfaces — border, radius, ink, gap (always on)
+
+**Golden sentence:** Depth comes from **border + surface ladder**, not cast shadows. Every fill owns its ink and hairline. Bordered peer sections never kiss (≥8px). Content inside a rounded shell insets ≥ the radius.
+
+---
+
+## No box-shadow elevation
+
+**Golden sentence:** Studio chrome and ideal-stack UI **do not use cast box-shadows** for depth. Separate surfaces with **border + surface ladder** (`bg-canvas` / `bg-surface` / `bg-surface-raised`). Floating menus, cards, tiles, and popovers stay flat.
+
+| Do | Don't |
+| --- | --- |
+| Edge = `border` / ink hairline (`border-on-surface/14`, `border-border-bui`) | `shadow-sm` / `shadow-md` / `shadow-lg` / `shadow-xl` |
+| Depth = next surface rung (`bg-surface-raised` over `bg-surface`) | Blur / soft drop shadows under cards, grids, menus |
+| Focus / selected = `ring-*` or transparent-reserve border | Fake elevation with `hover:shadow-*` |
+| Shared menus via `MENU_*` / `SELECT_MENU_*` (no shadow) | One-off `shadow-lg` on View / account / context menus |
+
+**Forbidden (elevation class):** `shadow`, `shadow-sm|md|lg|xl|2xl`, custom `shadow-[0_12px_40px_…]`, `hover:shadow-md` drag lift.
+
+```ts
+// ✅ flat card / menu — border + raised fill
+"rounded-2xl border border-on-surface/14 bg-surface-raised"
+// ❌ elevation shadow
+"… bg-surface-raised shadow-sm hover:shadow-md"
+```
+
+**Allowed (not elevation):** `ring-*` / `ring-inset` for focus/selection; `shadow-[0_0_0_Npx_…]` as a **ring substitute** (zero blur); `shadow-[inset_…]` hairline; design-token **atlas** preview tiles (docs only); true vendor bridges that already paint shadows (prefer strip when we own the surface).
+
+Flat surfaces: `HOME_WIDGET_TILE*`, `MENU_PANEL_*`, `SELECT_MENU_*`, context menus, composer popovers, directory tiles / settings groups — all border + fill only.
+
+---
+
+## Background ↔ text / hairline awareness
+
+**Golden sentence:** Every fill owns its ink and hairline — borders and labels follow the surface hue; never leave cool slate edges or muddy ink on a tinted shell.
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **Ink from background** — fg clears WCAG AA (~4.5) on its fill | Chip/label ink same family as muted fill (brown-on-brown) |
+| 2 | **Hairlines share hue** — borders = ink mixed onto the surface (or `border-on-surface/N`) | Cool `#232830` / zinc borders on warm yellow/brown shells |
+| 3 | **One edge** — composer / token cards use a **single** hairline | `border` + inset `ring` double edge (aliased muddy frame) |
+| 4 | **Theme paint updates border** — soft/fill shell patches set `border.default` / `strong` with bg/fg | Soft shell only patches `bg`/`fg`; leftover slate borders |
+| 5 | **Nest one step** — text/cards inside a painted shell use the next ladder step (solid token) | `bg-surface-muted/20` tool cards inside a `bg-surface-raised` bubble |
+
+### Surface ladder (Studio `--as-color-bg-*` → Tailwind)
+
+| Role | Token | Use |
+| --- | --- | --- |
+| Page / recessed well | `bg-canvas` | Desk body, **inset** wells inside raised cards (tools, `<pre>`, thinking) |
+| Panel / column | `bg-surface` | Chat column, window body |
+| Lifted chrome | `bg-surface-raised` (`sidebar`) | Bubbles, popovers, rails |
+| Soft inset / chips | `bg-surface-muted` (`muted`) | Context chips, inline `code`, option pills |
+
+**Nesting rule:** parent already on a shell fill → child uses a **different** rung (`canvas` recessed or `muted` chip), **solid** — never `*/10`–`*/30` washes of the same rung. Floating menus lift (`raised`), they don't match the parent.
+
+### Soft / fill shell
+
+When writing `STUDIO_THEME_SOFT_SHELLS` / `fillShell`: set `bg` + `fg` + **`border`** together; dark hairline ≈ mix primary ink ~14% onto surface; `expandFillShellPatch` already derives ink + hairline — don't strip them; rely on the hue scale (canvas ≠ surface ≠ sidebar ≠ muted).
+
+Pure helpers: `@glassbox-studio/studio-core` → `pickReadableInk`, `deriveHairlineBorder`, `meetsContrast`, `ensureReadableFg`, `buildShellHueBgPalette`.
+
+---
+
+## Chrome section gap — never kiss
+
+**Golden sentence:** Adjacent **bordered** chrome sections (fields, chips, cards, outlined controls) **never kiss** — leave at least **8px** between peers so outlines read as separate.
+
+| Relationship | Min gap | Tailwind | Token (`space.*`) |
+| --- | --- | --- | --- |
+| Icon cluster / segmented guts (same control) | 4px | `gap-1` | `1` |
+| **Peer bordered sections** (field cells, chips, inset panels in a row) | **8px** | `gap-2` | `2` |
+| Distinct field groups / toolbar bands | 12–16px | `gap-3` / `gap-4` | `3` / `4` |
+
+**Floor for peer sections = 8px.** Prefer 12–16px when outlines are thick or labels sit on the border — tight 8px still looks fused. Put gap on the **row/stack** (`flex` + `gap-*`, grid `gap-*`); Studio reuses `GAP_SECTION` / `GAP_SECTION_COMFORT`. Don't rely on negative margins to "tighten" bordered peers; don't invent one-off `gap-[3px]`.
+
+---
+
+## Rounded inset pad
+
+**Golden sentence:** Content inside a **rounded** chrome shell must clear the corner arc — inset ≥ radius on every edge that meets the curve. Never flush a control (button, input, checkbox row) into a rounded border.
+
+`rounded-xl` ≈ **12px** → Studio floor inset **`px-3.5` / `pb-3.5` (14px)**. Larger radius → bump pad with the shell.
+
+| # | Law | Fail if |
+| --- | --- | --- |
+| 1 | **Inset ≥ radius** | Control paint meets the curved stroke |
+| 2 | **No full-bleed actions in rounded groups** | `w-full` button as last child with `mt-*` only, no `mx`/`mb`/`footer` |
+| 3 | **Last child owns bottom air** | Final row/fieldset/footer has ≥ `pb-3.5` (or group uses padded footer) |
+| 4 | **Match gutters** | Horizontal pad matches sibling rows (`SETTINGS_ROW` / `SETTINGS_FIELD` = `px-3.5`) |
+| 5 | **Nested radius** | Prefer inset square-ish / shared button radius **inside** pad — never child corners sitting on parent corners |
+
+| Do | Don't |
+| --- | --- |
+| `SETTINGS_ROW` / `SETTINGS_FIELD` / `SETTINGS_GROUP_FOOTER` | Bare `<button class="w-full">` as last child of `SETTINGS_GROUP` |
+| `SETTINGS_FIELDSET` with bottom inset when last in group | `fieldset` `p-0` ending flush on the arc |
+| Inset primary actions: `SETTINGS_GROUP_FOOTER` + `SETTINGS_BTN*` | `DATA_GRID_BTN_PRIMARY` edge-to-edge under `overflow-hidden rounded-xl` |
+| Title **inside** a group: `px-3.5 pt-3.5` (or row) | `SETTINGS_GROUP_LABEL` (`px-1`) used as in-card title |
+
+Settings tokens: `SETTINGS_ROW` / `SETTINGS_FIELD` (`px-3.5 py-3`), `SETTINGS_GROUP_FOOTER` (`px-3.5 pb-3.5 pt-2`), `SETTINGS_NEST_BAND` (already `p-3.5`), `SETTINGS_CHECK_ROW` (last check block still needs group/fieldset bottom inset).
+
+---
+
+## Agent checklist (every surface edit)
+
+- [ ] No new `shadow-sm|md|lg|xl` or cast `shadow-[…]` on product chrome — border + surface ladder only
+- [ ] New chip/token/composer edge uses ink-relative border (or hue-matched token border)
+- [ ] Nested content steps the ladder (solid) — no low-opacity same-hue wash
+- [ ] No new `border` + inset `ring` double frames
+- [ ] Bordered peers have ≥ `gap-2` (8px); comfort rows use `gap-3`/`gap-4`
+- [ ] Rounded shell: horizontal inset ≥ radius; bottom inset on last content or dedicated footer; no full-bleed rounded child flush to parent curve
+
+## Related
+
+- `design/layout.mdc` — section → container → content; bordered inset surfaces
+- `design/design-system.mdc` — Studio Tailwind + `--as-*` + `@glassbox-studio/ui-*`
+- `design/components.mdc` — pager inset / drawer chrome (radius detail)
+- Primitives: `packages/library/ui-primitives/src/menu-classes.ts`, `select-classes.ts`
+- Skill: `.cursor/skills/engineering/background-text-awareness/SKILL.md`
+- Tokens: `packages/studio/studio-theme-default/tokens.json` → `space`

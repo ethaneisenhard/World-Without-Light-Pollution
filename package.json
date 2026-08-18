@@ -1,0 +1,40 @@
+{
+  "name": "@glassbox-studio/world-against-light-pollution",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate-pages.mjs",
+    "generate:theme": "node scripts/generate-theme.mjs",
+    "build:css": "pnpm generate:theme && tailwindcss -i ./src/styles/site.css -o ./public/styles.css --minify",
+    "dev": "pnpm build:css && node scripts/generate-pages.mjs && wrangler dev --local --port 8794 --inspector-port 9236",
+    "db:migrate:local": "wrangler d1 migrations apply world-against-light-pollution --local",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@glassbox-studio/analytics": "workspace:*",
+    "@glassbox-studio/auth": "workspace:*",
+    "@glassbox-studio/canvas-inspector": "workspace:^",
+    "@glassbox-studio/consent": "workspace:*",
+    "@glassbox-studio/identity": "workspace:*",
+    "@glassbox-studio/sandbox-engine": "workspace:*",
+    "@glassbox-studio/studio-core": "workspace:*",
+    "@glassbox-studio/ui-icons": "workspace:*",
+    "@glassbox-studio/ui-tokens": "workspace:*",
+    "@glassbox-studio/components": "workspace:*",
+    "remix": "3.0.0-beta.5"
+  },
+  "devDependencies": {
+    "@glassbox-studio/preview-draft": "workspace:*",
+    "@cloudflare/workers-types": "^4.20260415.1",
+    "@tailwindcss/cli": "^4.1.11",
+    "esbuild": "^0.25.0",
+    "tailwindcss": "^4.1.11",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5",
+    "vitest": "^3.0.0",
+    "wrangler": "^4.14.0"
+  }
+}

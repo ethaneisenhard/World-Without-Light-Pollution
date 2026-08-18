@@ -1,0 +1,6 @@
+{
+  "id": "project-media",
+  "kind": "media-local",
+  "label": "Project media (disk)",
+  "path": "media"
+}
