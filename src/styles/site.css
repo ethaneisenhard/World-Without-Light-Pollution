@@ -11,13 +11,20 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ── Earth logo + home hero (World Against Light Pollution) ── */
-@keyframes earth-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* ── Earth logo (Studio pending-globe) + home hero ── */
+.logo-globe {
+  display: inline-flex;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 30% 30%, #232a35, #0f172a 70%, #020617);
+  box-shadow: inset 0 0 0 1px rgb(79 140 255 / 0.25);
+  overflow: hidden;
 }
-.earth-spin {
-  animation: earth-spin 26s linear infinite;
+.logo-globe__svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 [data-as-instance="home-band"] {

@@ -116,7 +116,7 @@ function navHtml(page: SitePageId): string {
       instanceId: "site-header",
     },
     slots: {
-      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="earth-spin inline-flex shrink-0 text-accent" aria-hidden="true">${outlineIconSvgByName("globe-alt", "size-7")}</span><span class="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">${escapeHtml(SITE_BRAND.name)}</span></a>`,
+      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="logo-globe shrink-0" data-as-logo-globe aria-hidden="true"></span><span class="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">${escapeHtml(SITE_BRAND.name)}</span></a>`,
       nav: links,
       actions: themeToggle,
     },
@@ -212,6 +212,20 @@ function shell(
       })};
     </script>
     <script src="/analytics-client.js" defer></script>
+    <script src="/logo-globe.js" defer></script>
+    <script>
+      (function () {
+        function mountLogoGlobe() {
+          var host = document.querySelector("[data-as-logo-globe]");
+          if (host && window.__AS_LOGO_GLOBE) window.__AS_LOGO_GLOBE.mount(host);
+        }
+        if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", mountLogoGlobe);
+        } else {
+          mountLogoGlobe();
+        }
+      })();
+    </script>
   </body>
 </html>`;  if (strip) {
     html = stripAuthoringAttrsFromHtml(html, { strip: true });
