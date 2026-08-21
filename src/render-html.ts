@@ -1,6 +1,5 @@
 import {
   SITE_BRAND,
-  SITE_AUTH_NAV,
   SITE_FOOTER_GROUPS,
   SITE_HEADER_NAV,
   SITE_RESOURCES_NAV,
@@ -26,9 +25,12 @@ import {
   articleBlocksFromDoc,
   composeArticleFromMarkdownHtml,
   composeContactPageHtml,
+  composeCountyLetterHtml,
   composeHomeHeroHtml,
+  composeLumenLabHtml,
   homeHeroCopyFromDoc,
 } from "./site-compose-pure.js";
+import { homePathsFromDoc } from "./home-paths-pure.js";
 import {
   renderFooter,
   renderHeader,
@@ -45,6 +47,8 @@ export type RenderDraftOpts = {
   studioPreview?: boolean;
   /** Local ideal-stack host (127.0.0.1 / localhost) — keep attrs + guest. */
   devSite?: boolean;
+  /** Request origin for share/mail links (no invented public domain). */
+  siteOrigin?: string;
 };
 
 /** Node preview may set this to read `content/pages/*.md` live (no module cache). */
@@ -99,12 +103,7 @@ function navHtml(page: SitePageId): string {
 
   const dropdown = `<details class="group/dd relative max-md:w-full"><summary class="flex cursor-pointer list-none items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-ink-soft hover:text-ink max-md:px-3 max-md:py-3 max-md:text-base [&::-webkit-details-marker]:hidden">Resources<span class="transition-transform group-open/dd:rotate-180" aria-hidden="true">${outlineIconSvgByName("chevron-down", "size-4 shrink-0")}</span></summary><div class="flex flex-col max-md:pl-3 md:absolute md:left-0 md:top-full md:z-30 md:mt-1 md:w-60 md:rounded-xl md:border md:border-line md:bg-paper-raised md:p-1.5 md:shadow-md">${resourceLinks}</div></details>`;
 
-  const signIn = renderNavLink({
-    props: { href: SITE_AUTH_NAV.login.path, current: "off", className: linkClass },
-    slots: { label: SITE_AUTH_NAV.login.label },
-  });
-
-  const links = headerLinks + dropdown + signIn;
+  const links = headerLinks + dropdown;
   const themeToggle = renderThemeToggleButton();
 
   return renderHeader({
@@ -116,7 +115,7 @@ function navHtml(page: SitePageId): string {
       instanceId: "site-header",
     },
     slots: {
-      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="logo-globe shrink-0" data-as-logo-globe aria-hidden="true"></span><span class="font-display text-xl font-semibold tracking-tight text-ink md:text-2xl">${escapeHtml(SITE_BRAND.name)}</span></a>`,
+      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="logo-globe shrink-0" data-as-logo-globe aria-hidden="true"></span><span class="font-display text-sm font-semibold tracking-tight text-ink md:text-base">${escapeHtml(SITE_BRAND.name)}</span></a>`,
       nav: links,
       actions: themeToggle,
     },
@@ -139,7 +138,7 @@ function footerHtml(): string {
     slots: {
       brand: `<span class="font-display text-base text-ink">${escapeHtml(SITE_BRAND.name)}</span><p class="mt-3 max-w-xs text-sm leading-relaxed text-ink-soft">${escapeHtml(SITE_BRAND.tagline)}</p>`,
       columns,
-      bottom: "World Against Light Pollution · Cloudflare Workers",
+      bottom: "World Without Light Pollution",
     },
   });
 }
@@ -165,6 +164,12 @@ function shell(
   const inspectorScript = strip
     ? ""
     : `<script src="/as-canvas-inspector.js" defer></script>`;
+  const lumenLabScript = body.includes("data-as-lumen-lab")
+    ? `<script src="/lumen-lab.js" defer></script>`
+    : "";
+  const countyLetterScript = body.includes("data-nl-county-letter")
+    ? `<script src="/county-letter.js" defer></script>`
+    : "";
   let html = `<!DOCTYPE html>
 <html lang="en" class="${darkClass}" data-theme="${theme}" style="color-scheme:${theme}">
   <head>
@@ -205,7 +210,7 @@ function shell(
     ${inspectorScript}
     <script>
       window.__AS_ANALYTICS_BOOT__ = ${JSON.stringify({
-        siteId: "world-against-light-pollution",
+        siteId: "world-without-light-pollution",
         analytics: analyticsIntegration,
         consent: consentIntegration,
         environment: "dev",
@@ -213,6 +218,8 @@ function shell(
     </script>
     <script src="/analytics-client.js" defer></script>
     <script src="/logo-globe.js" defer></script>
+    ${lumenLabScript}
+    ${countyLetterScript}
     <script>
       (function () {
         function mountLogoGlobe() {
@@ -264,6 +271,7 @@ function homeBody(opts?: RenderDraftOpts): string {
   return composeHomeHeroHtml({
     tagline,
     subtitle,
+    pathCopy: homePathsFromDoc(doc.body),
     sourcePath: contentPathForPage("home"),
   });
 }
@@ -277,7 +285,29 @@ function articleBody(page: SitePageId, opts?: RenderDraftOpts): string {
     title: doc.title,
     body: doc.body,
     sourcePath,
-    projectId: "world-against-light-pollution",
+    projectId: "world-without-light-pollution",
+  });
+}
+
+/** Lumens page = interactive lab first (markdown is title + one-line cue). */
+function lumensBody(opts?: RenderDraftOpts): string {
+  const doc = contentOrFallback("lumens", opts);
+  const { title, paragraphs } = articleBlocksFromDoc(doc);
+  return composeLumenLabHtml({
+    sourcePath: contentPathForPage("lumens"),
+    title,
+    intro: paragraphs[0] ?? "",
+  });
+}
+
+function emailYourCountyBody(opts?: RenderDraftOpts): string {
+  const doc = contentOrFallback("email-your-county", opts);
+  const { title, paragraphs } = articleBlocksFromDoc(doc);
+  return composeCountyLetterHtml({
+    title,
+    paragraphs,
+    sourcePath: contentPathForPage("email-your-county"),
+    siteOrigin: opts?.siteOrigin,
   });
 }
 
@@ -314,5 +344,9 @@ export function renderSitePage(page: SitePageId, opts?: RenderDraftOpts): string
   const theme = opts?.theme ?? "light";
   if (page === "home") return shell(page, homeBody(opts), theme, opts);
   if (page === "contact") return shell(page, contactBody(opts), theme, opts);
+  if (page === "lumens") return shell(page, lumensBody(opts), theme, opts);
+  if (page === "email-your-county") {
+    return shell(page, emailYourCountyBody(opts), theme, opts);
+  }
   return shell(page, articleBody(page, opts), theme, opts);
 }

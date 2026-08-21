@@ -1,4 +1,4 @@
-# World Against Light Pollution
+# World Without Light Pollution
 
 Educational + advocacy site about light pollution — forked from the Glass Box
 Studio **studio starter** (`projects/glassbox-studio-template`) into a
@@ -27,7 +27,7 @@ pnpm dev                    # http://127.0.0.1:8794
 ## Pages
 
 `/` (home) · `/what-is-light-pollution` · `/lumens` · `/impacts` · `/petition`
-· `/resources` · `/about` · `/contact`
+· `/resources` · `/email-your-county` · `/about` · `/contact`
 
 ## Editing content
 
@@ -37,7 +37,7 @@ Edit `content/pages/<slug>.md`, then `node scripts/generate-pages.mjs` (the
 ## Deploy (Cloudflare)
 
 ```bash
-wrangler d1 create world-against-light-pollution   # paste database_id into wrangler.jsonc
+wrangler d1 create world-without-light-pollution   # paste database_id into wrangler.jsonc
 pnpm db:migrate:local                              # local; remote: add --remote
 wrangler deploy
 ```

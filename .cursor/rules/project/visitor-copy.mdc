@@ -1,0 +1,84 @@
+---
+description: Visitor copy is the experience — never explain how the site works
+alwaysApply: true
+---
+
+# Visitor copy — no meta, no UI tour
+
+**Golden sentence:** The site *is* the lesson. Never narrate the layout, the cards, the playground, or how to use the page.
+
+Visitor-facing = `content/pages/**`, lab `caption` / `teach`, compose fallbacks, nav labels, buttons. Not code comments.
+
+## Forbidden (narrator class)
+
+| Don't write | Why |
+| --- | --- |
+| "Each card below is one kind, with its own playground" | Explains the website |
+| "The playground under a heading belongs to that heading" | Agent leftover |
+| "This playground" / "this demo" / "Kind 1 of 4" | Labels the chrome |
+| "Drag the scene. Hover the markers." | Tutorial for the UI |
+| "Slide **Cover / diffusion**" / "Toggle messy vs calm" | Names controls |
+| "The interactive demo loads with JavaScript" | Breaks the fourth wall |
+| "Click here to learn" / "as you'll see below" | Tour-guide voice |
+
+Teach **light** — skyglow, glare, a cover, red at night. The scene is already there. Don't announce it.
+
+## Tone — teach, then give a path
+
+**Golden sentence:** Direct, polite, clear. Education, then options. No sermons, no talking down, no soft riddles.
+
+Brand tagline stays **Reclaim the night sky.** That is the line. Do not replace it with a softer slogan.
+
+| Don't | Do |
+| --- | --- |
+| "The night sky can come home" (unclear metaphor) | "The night sky is disappearing — and so is our health." |
+| "That's all this is." / "That's the whole invitation." | Stop when the fact is done |
+| "The hope is simple" / "light that belongs" wrap-ups | A next step: letter, petition, product |
+| "Why bad lighting is a terrible idea" | What good lighting does |
+| "The Problem" / "Advocacy toolkit" | "Night light" / "For your street" |
+| "cobra-head" / "full cut-off" | Street lamp with or without a shade |
+| "biological cost" / "Full stop" / "the enemy" | Sleep, stars, a quieter bill |
+| "fight" / "wrecking" | What to try instead |
+
+Facts stay (AMA, birds, melatonin). After a fact, give an alternative or a path — home, street, or town.
+
+```md
+<!-- ❌ -->
+Light at night isn't free. It has a measurable biological cost.
+
+<!-- ✅ -->
+Warm, aimed, modest light is a kindness — to your sleep, and to the sky we share.
+```
+
+```md
+<!-- ❌ -->
+Each card below is **one kind**, with **its own playground**.
+
+<!-- ✅ -->
+- **Skyglow** — the dome over town
+```
+
+```md
+<!-- ❌ -->
+Slide **Cover / diffusion** — the spear becomes a pool.
+
+<!-- ✅ -->
+A frosted cover turns the same lumens into a soft pool.
+```
+
+## Allowed
+
+- Facts, stories, what to do on *their street*
+- Jump links to a section (`[Skyglow](#skyglow)`)
+- How to fix a *phone* or *fixture* (iOS Color Tint) — that's the subject, not our chrome
+- Quiet `aria-label` on a lab (`Skyglow`) — not visible narrator copy
+
+## Agent checklist
+
+- [ ] No sentence that only makes sense if you built the page
+- [ ] No control names, drag/hover/tap-the-i instructions
+- [ ] Lab sit under a real heading — the heading is the label
+- [ ] Swept every `content/pages/*.md` you touched, not just the one in chat
+- [ ] Titles and nav are *for* something (sleep, sky, street) — not "the problem" / "terrible"
+- [ ] No wrap-up sermons ("that's all this is", "the hope is simple")
+- [ ] Tagline stays **Reclaim the night sky.**

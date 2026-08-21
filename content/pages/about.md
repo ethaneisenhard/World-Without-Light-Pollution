@@ -1,24 +1,22 @@
 ---
-title: About the movement
+title: Why we're here
 visibility: public
 ---
 
-**World Against Light Pollution** exists because the night sky — the oldest, most universal human experience — is being engineered away one unshielded fixture at a time, and almost nobody is treating it as the solvable problem it is.
+**World Without Light Pollution** is for people who want the night sky back in ordinary places — and lighting that still helps you see the path home.
 
 ## What we believe
 
-- Light pollution is **real pollution**. It has measurable health, ecological, and climate costs.
-- It is **the easiest pollution to fix**. Turn the light off, or aim it down, and the pollution is gone — instantly, with no cleanup.
-- The answer is **not darkness**. It's warm, shielded, correctly-aimed, dimmed-when-unneeded light. Visibility and safety *improve* when lighting is done right.
+- A dark sky is part of a healthy night — for people, for wildlife, and for the climate we share.
+- Kind lighting is simple. Warm it, aim it down, dim it when the street is empty.
+- This is **not about turning lights off**. Visibility and ease *grow* when light is placed with care.
 
 ## What we do
 
-1. **Educate** — explain lumens, lux, Kelvin, and shielding in language anyone can use at a council meeting.
-2. **Advocate** — push for a concrete, evidence-based public lighting standard: ≤3000K, fully shielded, dimmed after hours.
-3. **Equip** — give residents the audit checklist, the sample letter, and the model ordinance to change their own street.
+1. **Share the words** — lumens, lux, Kelvin, and shielding, in language you can take to a neighbor or a council meeting.
+2. **Ask for a gentle standard** — 3000K or warmer, fully shielded, quieter after midnight.
+3. **Hand you the tools** — a walk of your own street, a letter to the county, and a model ordinance.
 
 ## Where we're headed
 
-Today this is an educational site. Soon it will grow into a community — a place to report bad fixtures, track petitions in your city, and coordinate with neighbors who want their sky back.
-
-The movement is simple: **fix the lights, not the night.**
+Today this is a place to learn. Next: local asks, neighbor letters, and a shared standard you can take to a council.

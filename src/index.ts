@@ -63,11 +63,18 @@ function renderFromRequest(request: Request): string | null {
   } catch {
     /* keep default */
   }
+  let siteOrigin: string | undefined;
+  try {
+    siteOrigin = new URL(pageUrl).origin;
+  } catch {
+    /* omit — letter still names the site */
+  }
   return renderSitePage(page, {
     getDraft: (path) => draftStore.get(path),
     theme,
     studioPreview,
     devSite: isDevSiteHost(hostname),
+    siteOrigin,
   });
 }
 
@@ -199,7 +206,7 @@ export default {
     if (url.pathname === "/health") {
       return Response.json({
         ok: true,
-        service: "world-against-light-pollution",
+        service: "world-without-light-pollution",
         drafts: draftStore.size(),
       });
     }
@@ -218,7 +225,9 @@ export default {
       url.pathname === "/design-inspector.js" ||
       url.pathname === "/design-system-edit.js" ||
       url.pathname === "/integrations-client.js" ||
-      url.pathname === "/analytics-client.js"
+      url.pathname === "/analytics-client.js" ||
+      url.pathname === "/lumen-lab.js" ||
+      url.pathname === "/county-letter.js"
     ) {
       return env.ASSETS.fetch(request);
     }
@@ -239,6 +248,7 @@ export default {
         theme,
         studioPreview,
         devSite: isDevSiteHost(url.hostname),
+        siteOrigin: url.origin,
       }),
       {
         headers: { "Content-Type": "text/html; charset=utf-8" },

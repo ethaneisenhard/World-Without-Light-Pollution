@@ -1,28 +1,33 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "world-against-light-pollution",
+  "name": "world-without-light-pollution",
+  "account_id": "c96f5c11e25505555d06dc79e77c6574",
   "compatibility_date": "2026-04-16",
   "main": "./src/index.ts",
   "assets": {
     "directory": "./public",
     "binding": "ASSETS"
   },
-  // Auth (email/password + Google + reset) is D1-backed. Run once per project:
-  //   wrangler d1 create world-against-light-pollution      → paste the returned database_id below
-  //   pnpm db:migrate:local                                  → apply ./migrations to local D1
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "world-against-light-pollution",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_name": "world-without-light-pollution",
+      "database_id": "62443965-cdcc-4d15-bd94-4e8f4520e94f",
       "migrations_dir": "./migrations"
     }
   ],
-  // When enabling MCP OAuth (createStudioMcpOAuthProvider), bind KV:
-  // "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "<kv-id>", "preview_id": "<preview-id>" }]
+  "workers_dev": true,
+  "routes": [
+    {
+      "pattern": "worldwithoutlightpollution.org/*",
+      "zone_name": "worldwithoutlightpollution.org"
+    },
+    {
+      "pattern": "www.worldwithoutlightpollution.org/*",
+      "zone_name": "worldwithoutlightpollution.org"
+    }
+  ],
   "vars": {
-    "SESSION_SECRET": "dev-only-starter-session-secret-change-me",
-    // Set for Google OAuth + password reset links. Local default:
-    "APP_ORIGIN": "http://127.0.0.1:8794"
+    "APP_ORIGIN": "https://worldwithoutlightpollution.org"
   }
 }

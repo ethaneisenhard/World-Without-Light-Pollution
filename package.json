@@ -1,5 +1,5 @@
 {
-  "name": "@glassbox-studio/world-against-light-pollution",
+  "name": "@glassbox-studio/world-without-light-pollution",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -8,7 +8,7 @@
     "generate:theme": "node scripts/generate-theme.mjs",
     "build:css": "pnpm generate:theme && tailwindcss -i ./src/styles/site.css -o ./public/styles.css --minify",
     "dev": "pnpm build:css && node scripts/generate-pages.mjs && wrangler dev --local --port 8794 --inspector-port 9236",
-    "db:migrate:local": "wrangler d1 migrations apply world-against-light-pollution --local",
+    "db:migrate:local": "wrangler d1 migrations apply world-without-light-pollution --local",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },

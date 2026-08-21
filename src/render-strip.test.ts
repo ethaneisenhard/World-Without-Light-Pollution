@@ -11,6 +11,7 @@ describe("prod strip authoring attrs", () => {
     expect(html).not.toContain("data-as-instance");
     expect(html).not.toContain("as-canvas-inspector.js");
     expect(html).toContain('data-as-component="blog-hero"');
+    expect(html).toContain("nl-hero-band");
   });
 
   it("keeps attrs + guest on local ideal-stack preview", () => {

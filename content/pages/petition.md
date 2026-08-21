@@ -1,29 +1,61 @@
 ---
-title: The petition: fix the lights, not the night
+title: A simple ask for kinder streets
 visibility: public
 ---
 
-We're asking towns, cities, and counties to adopt a simple, evidence-backed standard for public outdoor lighting. It doesn't turn the lights off — it turns them *right*.
+We're inviting towns, cities, and counties to adopt a short, evidence-backed standard for public outdoor lighting. Lights stay on. They just get warmer, lower, and more useful.
 
-## What we're calling for
+## What we're asking for
 
-1. **A lumen cap on residential street lighting.** New and replacement street lights should not exceed the minimum lumen output needed for the road's actual design speed and traffic — not "as bright as the vendor sells."
-2. **Warm color, by default.** All public outdoor lighting should be **3000K or warmer**. No blue-rich 4000K/5000K LEDs, which the American Medical Association has cautioned against.
-3. **Full shielding.** Every fixture must be fully shielded — flat lens, light aimed downward, zero uplight. If you can see the bare bulb from the side, it's failing.
-4. **Dim it after hours.** Smart dimming (or simple timers) should cut output to 50% or less between midnight and 5 a.m. when streets are empty.
-5. **No light where no one is.** Parks, parking lots, and signage that don't operate at night should not be lit at night. Full stop.
+1. **Enough light for the road you have.** New and replacement street lights can match the street's speed and traffic — a calm amount, not the brightest catalog page.
+2. **Warm color, by default.** Public outdoor lighting at **3000K or warmer**. The American Medical Association has asked us to be careful with cooler, blue-rich LEDs.
+3. **Full shielding.** A flat lens, light aimed down, nothing sent to the sky. If you can see the bare bulb from the sidewalk, a shade or a new head will help.
+4. **A quieter middle of the night.** Timers or smart dimming can ease output to 50% or less between midnight and 5 a.m. when streets are empty.
+5. **Light where people are.** Parks, lots, and signs can rest when nobody is using them.
 
-## The alternatives are already available
+[[lab:shield]]
 
-- **Full cut-off fixtures** eliminate glare and uplight while lighting the road *better*.
-- **Amber / narrow-spectrum LEDs** (like 2200K "warm-dim" and filtered PC-amber) cut blue-light impact dramatically.
-- **Diffusers and shields** retrofit existing heads cheaply — a $20 shield often beats a $5,000 re-lamp.
-- **Motion and adaptive controls** keep light available when needed and dark when not.
+A small shield or a frosted cover often does more than a whole new fixture. The same lumens become a pool.
 
-This is not a technology problem. Every one of these exists, is installed somewhere, and costs less over the fixture's life. It's a *defaults* problem.
+[[lab:diffuse]]
 
-## Add your name
+## The kinder fixtures already exist
 
-We're building a public petition to hand to city councils, transportation departments, and utility commissions. The more signatures behind a concrete standard, the harder it is for a city to buy 5000K unshielded cobra-heads on autopilot.
+- **A street lamp with a shade** keeps light on the road, where it helps you see.
+- **Amber and warm-dim LEDs** (around 2200K, or filtered PC-amber) are easy on eyes and on the living night.
+- **Diffusers and shields** fit many heads already in place.
+- **Motion and adaptive controls** wait until someone is there.
 
-*Signing will be available here soon. Until then, the single most powerful thing you can do is [write to your local government](/resources) — a handful of letters changes a council vote.*
+These are on streets today. They usually cost less over the life of the fixture. The opening is just to make them the usual choice.
+
+[[lab:kelvin]]
+
+[[lab:dim]]
+
+## Two ways to add your name
+
+Sign where it already works — then bring the same words home.
+
+### A shared ask (everywhere)
+
+One global petition, same five points above. It's for awareness: show a mayor, a utility, or a neighbor that kinder street light is a usual wish, not a niche one.
+
+We'll put the public link here as soon as it's live. Until then, [email your county](/email-your-county) is the fastest yes.
+
+### Your town
+
+Councils listen to *their* streets. A local petition — aimed at your public works director or council — sits next to the global one.
+
+1. Copy the five asks above. Keep them short.
+2. Open [Change.org](https://www.change.org/start-a-petition) (wide reach, no login on our site) or [Action Network](https://actionnetwork.org/petition-tool/) if a group already owns an email list.
+3. Target a person with a name: "The [City] Council" or "Public Works."
+4. Share it on the block group. Hand the same text to neighbors who prefer paper.
+
+### Neighbors and the county
+
+Signatures help. A few specific letters often help more.
+
+- [Email your county](/email-your-county) — a neighbor note, plus where to find Public Works.
+- [Walk your street](/resources) — photos, fixture notes, the one-page standard.
+- Lead with what towns already love: easier driving, quieter bills, bedrooms that can go dark. The stars come along.
+

@@ -36,4 +36,14 @@ describe("renderSection", () => {
     expect(html).toContain("py-24");
     expect(html).toContain("bg-sand");
   });
+
+  it("appends className for visitor paint", () => {
+    const html = renderSection({
+      props: { className: "nl-hero-band", instanceId: "home-band" },
+      children: "Sky",
+      chrome: "live",
+    });
+    expect(html).toContain("nl-hero-band");
+    expect(html).toContain("Sky");
+  });
 });

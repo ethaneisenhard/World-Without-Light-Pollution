@@ -1,6 +1,6 @@
 {
-  "id": "world-against-light-pollution",
-  "name": "World Against Light Pollution",
+  "id": "world-without-light-pollution",
+  "name": "World Without Light Pollution",
   "mode": "native",
   "purpose": "marketing-site",
   "nav": {
@@ -119,7 +119,7 @@
   },
   "hosting": {
     "provider": "cloudflare",
-    "prod_url": "http://127.0.0.1:9889",
+    "prod_url": "https://worldwithoutlightpollution.org",
     "config_path": "wrangler.jsonc",
     "hmr": {
       "bridge": "/as-hmr-bridge.js",

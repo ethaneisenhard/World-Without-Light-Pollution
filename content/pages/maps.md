@@ -1,20 +1,24 @@
 ---
-title: Light pollution maps
+title: See your sky
 visibility: public
 ---
 
-See the problem in pixels. These interactive maps show how bright your sky is, where the darkest places are, and how light pollution has spread across the planet.
+These maps show how bright a night is, where the dark places remain, and how glow has grown. Find your street. Notice what's still possible.
 
 ## Explore the maps
 
-- **[Light Pollution Map](https://www.lightpollutionmap.info/)** — the definitive interactive world map. Zoom to your address, click for exact sky brightness (SQM / Bortle class), and toggle satellite layers back to 1992 to watch your town's glow grow.
-- **[Dark Site Finder](https://darksitefinder.com/)** — a color-coded map of light pollution over the U.S. and the world, built to find the nearest truly dark horizon.
-- **[International Dark-Sky Places](https://darksky.org/what-we-do/international-dark-sky-places/)** — the IDA's directory of certified Dark Sky Parks, Reserves, and Communities — places that have actually fixed their lighting.
-- **[NASA Earth at Night](https://earthobservatory.nasa.gov/features/NightLights)** — the "Black Marble" satellite view of the whole planet at night. The single most striking image of how much light we waste upward.
-- **[Globe at Night](https://globeatnight.org/)** — a citizen-science project: measure your own sky's darkness with your eyes and contribute to a global brightness dataset.
+- **[Light Pollution Map](https://www.lightpollutionmap.info/)** — a world map of sky brightness. Zoom to your address, read SQM / Bortle class, and look back toward 1992.
+- **[Light Pollution Map (2026)](https://lightpollutionmap.app/)** — 2026 estimates beside the latest satellite layer. Bortle class, SQM, and dark-sky conditions for any place.
+- **[Dark Site Finder](https://darksitefinder.com/)** — a color-coded map for finding a nearby dark horizon.
+- **[International Dark-Sky Places](https://darksky.org/what-we-do/international-dark-sky-places/)** — Dark Sky Parks, Reserves, and Communities — towns that chose warmer, downward light.
+- **[NASA Earth at Night](https://earthobservatory.nasa.gov/features/NightLights)** — the "Black Marble" view of Earth after dark. A portrait of how much light leaves the ground.
+- **[Globe at Night](https://globeatnight.org/)** — look up, note your sky, and add it to a shared record.
 
-## How to read a light pollution map
+## How to read a map
 
-Most maps color-code by **Bortle class** or **sky brightness (mag/arcsec²)**. Red, orange, and yellow are skies that never get dark — over-lit streets and floodlights dominate. Blue and black are the places where the Milky Way is still visible.
+- Most maps color-code by **Bortle class** or **sky brightness (mag/arcsec²)**.
+- **Red, orange, and yellow** — bright nights, lots of street and flood light.
+- **Blue and black** — the Milky Way can still visit.
+- Find your home. Ask what a warmer, downward fixture could give back.
 
-Find your home on the map. Then ask: *is all this glow doing anyone any good?*
+[[lab:skyglow]]

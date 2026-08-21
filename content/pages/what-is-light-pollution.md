@@ -3,23 +3,94 @@ title: What is light pollution?
 visibility: public
 ---
 
-Light pollution is artificial light that goes where it shouldn't — up into the sky, into your bedroom window, and into the eyes of drivers and wildlife. It is the sum of every over-bright, poorly-aimed, and needlessly-timed light fixture burning through the night.
+Light pollution is light that goes where it isn't needed — the sky, a bedroom, a driver's eyes. Aim it down, warm the color, or dim it. Below: the four kinds, what they look like at home, and what to change.
 
 ## The four kinds
 
-- **Skyglow** — the dome of light that hangs over every city and town, washing out the stars. It's light scattered by dust and water in the atmosphere, and it can travel over 100 miles from its source.
-- **Glare** — excessive brightness that blinds. Glare doesn't help you see; it *hides* what's behind it and forces your eyes to adapt downward.
-- **Light trespass** — light spilling onto property where it isn't wanted, like a neighbor's unshielded floodlight pouring into your bedroom.
-- **Clutter** — bright, confusing, excessive groupings of lights that fight for your attention instead of guiding it.
+- [Skyglow](#skyglow) — the dome over town
+- [Glare](#glare) — brightness that makes it harder to see
+- [Light trespass](#light-trespass) — glow on someone else's night
+- [Clutter](#clutter) — more lights than the street can use
 
-## The scale of the problem
+The same ideas show up [at home](#at-home-phone-tv-kitchen) — phone, TV, kitchen, porch.
 
-Roughly **80% of the world's population lives under light-polluted skies**. For more than **one-third of humanity, the Milky Way is invisible** — a night sky their ancestors could see every clear evening is now gone. In the United States and Europe, over 99% of people live under skies that never get truly dark.
+### Skyglow
 
-This isn't inevitable. It's the predictable result of cheap, unshielded, blue-rich lighting installed without asking a simple question: *where is this light going, and who actually needs it?*
+- A **soft dome** over a city or town, when light rises and scatters in the air.
+- Dust and water carry it a long way — sometimes over **100 miles**.
+- Same street, warmer and lower: more stars.
 
-## Why it matters
+[[lab:skyglow]]
 
-Light pollution is the easiest pollution to fix. Unlike chemical pollution, it disappears the moment the light turns off. There is no cleanup crew, no remediation — just better fixtures, warmer colors, and lights that point down, not up.
+### Glare
 
-That's what this movement is about: not turning the lights off, but turning them *right*.
+- Light so strong it makes the rest of the street harder to read.
+- Your eyes adapt to the bright patch, so the edges go dim.
+- A bare bulb is a tight beam. A cover turns the same lumens into a soft pool.
+
+[[lab:glare]]
+
+### Light trespass
+
+- Light that lands where it wasn't invited — a bedroom, a garden, a neighbor's dark.
+- Often a flood that could simply point down, or wear a shade.
+- Aim, shade, or dim. Their night can stay theirs.
+
+[[lab:trespass]]
+
+### Clutter
+
+- Extra signs and floods stacked on the same corner.
+- One aimed light is easier to follow than a row of competing ones.
+
+[[lab:clutter]]
+
+## At home — phone, TV, kitchen
+
+The same care works inside.
+
+- A phone at full brightness is a cool flood a few inches from your eyes.
+- A TV on HDR at midnight can light the whole room.
+- Kitchen cans and a porch flood work like a street light — just closer.
+
+### Phone screen
+
+- Dim first. Then try **red**.
+- Red keeps night vision. Cool white asks your brain to wake up.
+- Same idea as a red headlamp — in your hand.
+
+[[lab:phone]]
+
+### Television
+
+- A bright "vivid" picture at 11 p.m. fills the room.
+- A dimmer, warmer picture — or red for late night — lets the show be the brightest thing.
+- The room can stay quieter than the screen.
+
+[[lab:tv]]
+
+### Kitchen and ceiling lights
+
+- A shade, a warmer bulb, and a dimmer make most kitchens gentle after dark.
+- Light that stays in the room leaves the window for the night outside.
+
+[[lab:kitchen]]
+
+### Porch flood
+
+- A porch light can greet you without greeting the whole block.
+- Aim it down, warm it under 3000K, or let a motion sensor wait until someone is there.
+
+[[lab:porch]]
+
+## How common it is
+
+- Most people on Earth live under bright night skies.
+- For more than **one-third of us, the Milky Way is out of view**.
+- In the United States and Europe, truly dark nights are rare. Warmer, downward light brings stars back a street at a time.
+
+## What you can do
+
+- At home: warmer bulbs, shades, dimmers, a red phone screen. See [For your street](/resources) for products, and [Email your county](/email-your-county) for the letter.
+- On your block: [ask your town](/petition) for 3000K, full shielding, and dimming after midnight.
+- This is not about turning lights off. It's about aiming them.

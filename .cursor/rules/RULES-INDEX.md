@@ -18,4 +18,6 @@ Always-on layout law: `design/natural-document-flow.mdc` — follow **§ General
 
 **Not shipped** (Studio chrome only): `shell/`, `agent/`.
 
+**This project (not synced):** `project/visitor-copy.mdc` — visitor pages never explain how the site works.
+
 See template `AGENTS.md` and monorepo `.cursor/rules/RULES-INDEX.md`.

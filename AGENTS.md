@@ -28,4 +28,4 @@ Follow [kentcdodds/kody](https://github.com/kentcdodds/kody): Worker + `remix/ui
 
 ## Content
 
-Northline sample brand in `content/pages/`. Design registry via `@glassbox-studio/components` + local `client/design/`.
+Pages live in `content/pages/`. Visitor copy is the experience — never narrate layout, cards, or how to use the page. Rule: `.cursor/rules/project/visitor-copy.mdc`.

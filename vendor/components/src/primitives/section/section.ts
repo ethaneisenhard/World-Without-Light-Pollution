@@ -29,6 +29,8 @@ export type SectionProps = {
   padding?: SectionPadding;
   gap?: SectionGap;
   instanceId?: string;
+  /** Extra utilities — visitor paint that must survive Inspect-attr strip. */
+  className?: string;
 };
 
 export type SectionSlots = Record<string, never>;
@@ -81,6 +83,7 @@ export function renderSection(input: SectionRenderInput | SectionProps = {}): st
     padding = "lg",
     gap = "none",
     instanceId,
+    className,
   } = normalized.props ?? {};
   const chrome = normalized.chrome ?? "live";
   const children =
@@ -92,6 +95,7 @@ export function renderSection(input: SectionRenderInput | SectionProps = {}): st
     SECTION_PAD[padding],
     SECTION_GAP[gap],
     SECTION_BG[background],
+    className,
   ]
     .filter(Boolean)
     .join(" ");
