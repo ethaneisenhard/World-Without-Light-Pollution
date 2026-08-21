@@ -5,6 +5,9 @@ node_modules/
 .grok/
 .cache/
 .DS_Store
+coverage/
+dist/
+*.log
 
 # Local secrets
 .env

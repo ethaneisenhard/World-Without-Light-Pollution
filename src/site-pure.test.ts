@@ -15,6 +15,7 @@ describe("matchSitePage", () => {
     expect(matchSitePage("/lumens")).toBe("lumens");
     expect(matchSitePage("/what-is-light-pollution")).toBe("what-is-light-pollution");
     expect(matchSitePage("/impacts")).toBe("impacts");
+    expect(matchSitePage("/myths")).toBe("myths");
     expect(matchSitePage("/petition")).toBe("petition");
     expect(matchSitePage("/resources")).toBe("resources");
     expect(matchSitePage("/email-your-county")).toBe("email-your-county");

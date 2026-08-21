@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "generate": "node scripts/generate-pages.mjs",
-    "generate:theme": "node scripts/generate-theme.mjs",
+    "generate:theme": "tsx scripts/generate-theme.mjs",
     "build:css": "pnpm generate:theme && tailwindcss -i ./src/styles/site.css -o ./public/styles.css --minify",
-    "dev": "pnpm build:css && node scripts/generate-pages.mjs && wrangler dev --local --port 8794 --inspector-port 9236",
+    "build": "pnpm generate && pnpm build:css",
+    "dev": "pnpm build && wrangler dev --local --port 8794 --inspector-port 9236",
     "db:migrate:local": "wrangler d1 migrations apply world-without-light-pollution --local",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
