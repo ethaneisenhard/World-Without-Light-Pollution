@@ -133,21 +133,21 @@ export function composeHomeHeroHtml(input: {
   slots.ctaPrimary = renderButton({
     props: {
       variant: "primary",
-      href: "/petition",
+      href: "/email-your-county",
       className: buttonClassName("primary"),
       instanceId: "home-cta-primary",
     },
-    slots: { label: "Sign the petition" },
+    slots: { label: "Email your county" },
   });
   slots.ctaSecondary = renderButton({
     props: {
       variant: "secondary",
-      href: "/lumens",
+      href: "/resources",
       className:
         "inline-flex items-center rounded-full border border-on-hero/40 px-6 py-3 text-sm font-medium text-on-hero hover:border-on-hero/80 active:scale-[0.97] transition",
       instanceId: "home-cta-secondary",
     },
-    slots: { label: "Learn about lumens" },
+    slots: { label: "What to do tonight" },
   });
 
   const hero = renderBlogHero({

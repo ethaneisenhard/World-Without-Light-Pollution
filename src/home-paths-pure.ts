@@ -35,8 +35,11 @@ const HOME_PATH_HEADING: Record<string, HomePathId> = {
   learn: "learn",
   "after lights-out": "learn",
   "in your room": "learn",
+  "the phone on your pillow": "learn",
   "for your town": "town",
+  "the lamp with no shade": "town",
   "for yourself": "self",
+  "three things before bed": "self",
 };
 
 export const HOME_PATH_CHROME: Record<HomePathId, HomePathChrome> = {
@@ -44,7 +47,10 @@ export const HOME_PATH_CHROME: Record<HomePathId, HomePathChrome> = {
     eyebrow: "In your room",
     background: "muted",
     embedId: "iphone",
-    cta: { href: "/lumens", label: "Learn more about lumens" },
+    cta: {
+      href: "/myths#iphone-red-screen-on-a-triple-click",
+      label: "Turn the iPhone red",
+    },
     ctaPlace: "copy",
     ctaVariant: "secondary",
   },
@@ -61,32 +67,32 @@ export const HOME_PATH_CHROME: Record<HomePathId, HomePathChrome> = {
   self: {
     eyebrow: "Tonight",
     background: "transparent",
-    cta: { href: "/myths#iphone-red-screen-on-a-triple-click", label: "Turn the iPhone red" },
-    more: [
-      { href: "/resources#7-headlamps-fixtures-and-what-to-buy", label: "Headlamps and fixtures" },
-      { href: "/resources", label: "Full toolkit" },
-    ],
+    cta: {
+      href: "/resources#7-headlamps-fixtures-and-what-to-buy",
+      label: "Headlamps and fixtures",
+    },
+    more: [{ href: "/resources", label: "Full toolkit" }],
   },
 };
 
 export const HOME_PATH_FALLBACKS: Record<HomePathId, HomePathCopy> = {
   learn: {
     id: "learn",
-    title: "After lights-out",
+    title: "The phone on your pillow",
     story:
-      "It's late. The room is dark except the phone — a cool flood on the pillow, the ceiling, your face. The window goes blank. A dimmer, redder screen leaves the night in the room, and a few stars in the glass.",
+      "It's late. The room is dark except the phone — a cool flood on the pillow, the ceiling, your face. The window goes blank. Slide it to red. Night vision stays. A few stars come back in the glass.",
   },
   town: {
     id: "town",
-    title: "For your town",
+    title: "The lamp with no shade",
     story:
-      "Midnight on your block. A tall street lamp without a shade throws light up and out — a pale dome over the roofs. The sidewalk is bright; the Milky Way is gone. A shade, a warmer color, a little less after midnight — the road stays, the sky comes back.",
+      "Midnight on your block. A tall street lamp without a shade throws light up and out. The sidewalk is bright. The Milky Way is gone. Shade it, warm it, dim it after midnight. The road stays.",
   },
   self: {
     id: "self",
-    title: "For yourself",
+    title: "Three things before bed",
     story:
-      "Tonight: red on the phone, a warmer porch bulb, a headlamp that does not shout. Small light, aimed where you walk.",
+      "Red on the phone. A warmer porch bulb. A headlamp that does not shout. Small light, aimed where you walk.",
   },
 };
 
