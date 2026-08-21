@@ -1,4 +1,7 @@
-# Starter auth demo
+# Starter auth (dormant)
+
+Leftover from the studio-starter fork. The public World Without Light Pollution
+site does not show Sign in. Keep this file only if you later turn auth on.
 
 Uses shared `@glassbox-studio/auth` (Kent / Kody-shaped). Login / account / members are **Tailwind** pages on `/styles.css` — same ideal-stack tokens as the marketing site (`bg-paper`, `text-ink`, `border-line`, `bg-accent`, `font-display`).
 
