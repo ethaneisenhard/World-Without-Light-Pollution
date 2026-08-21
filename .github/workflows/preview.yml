@@ -1,0 +1,74 @@
+# Upload a Worker version per PR (does not change production traffic).
+# Stable alias: https://pr-<n>-world-without-light-pollution.<subdomain>.workers.dev
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: preview-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  preview:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm generate && pnpm build:css
+
+      - id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
+          command: >-
+            versions upload
+            --preview-alias pr-${{ github.event.pull_request.number }}
+            --message "PR #${{ github.event.pull_request.number }} @ ${{ github.sha }}"
+
+      - name: Comment preview URL
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEPLOY_URL: ${{ steps.deploy.outputs.deployment-url }}
+          COMMAND_OUTPUT: ${{ steps.deploy.outputs.command-output }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          MARKER="<!-- wwlp-pr-preview -->"
+          ALIAS="$(printf '%s\n' "$COMMAND_OUTPUT" | grep -Eo 'https://pr-[0-9]+-[A-Za-z0-9.-]+\.workers\.dev' | head -1 || true)"
+          URL="${ALIAS:-$DEPLOY_URL}"
+          if [ -z "$URL" ]; then
+            URL="https://pr-${PR}-world-without-light-pollution.devbyethan.workers.dev"
+          fi
+          BODY=$(cat <<EOF
+          ${MARKER}
+          **Preview:** ${URL}
+
+          Updates on each push. Production stays on [worldwithoutlightpollution.org](https://worldwithoutlightpollution.org).
+          EOF
+          )
+          EXISTING="$(gh api "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" --jq ".[] | select(.body | contains(\"${MARKER}\")) | .id" | head -1 || true)"
+          if [ -n "$EXISTING" ]; then
+            gh api -X PATCH "repos/${GITHUB_REPOSITORY}/issues/comments/${EXISTING}" -f body="$BODY"
+          else
+            gh api -X POST "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" -f body="$BODY"
+          fi
