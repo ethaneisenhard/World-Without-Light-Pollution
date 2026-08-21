@@ -1,8 +1,8 @@
 ---
-title: The Milky Way is still there. The streetlight is sitting on it.
+title: The night sky is disappearing — and so is our health.
 ---
 
-A bare lamp throws a pale dome over the roofs. A shade, a 3000K bulb, and a little less after midnight — the road stays, the sky comes back.
+World Without Light Pollution explains lumens, brightness, and how night lighting affects sleep and health — plus what you can do on your street and in your town.
 
 ## The phone on your pillow
 

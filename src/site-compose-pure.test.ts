@@ -81,12 +81,12 @@ describe("composeHomeHeroHtml", () => {
     expect(html).toContain('data-as-instance="home-cta-secondary"');
     expect(html).toContain("Ship it");
     expect(html).toContain("Sign the petition");
+    expect(html).toContain('href="/petition"');
     expect(html).toContain("Email your county");
-    expect(html).toContain('href="/email-your-county"');
-    expect(html).toContain("What to do tonight");
-    expect(html).toContain('href="/resources"');
+    expect(html).toContain("Learn about lumens");
+    expect(html).toContain('href="/lumens"');
     expect(html).not.toContain("Sample letter");
-    expect(html).not.toContain("Learn about lumens");
+    expect(html).not.toContain("What to do tonight");
     expect(html).not.toContain("Learn more about lumens");
     expect(html).toContain("The phone on your pillow");
     expect(html).toContain("The lamp with no shade");

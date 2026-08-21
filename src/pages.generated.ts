@@ -15,8 +15,8 @@ export const pages: Record<string, GeneratedPage> = {
     "body": "\nA short note from a neighbor works better than a formal complaint. Open it in your mail app, or copy it. Then send it to Public Works or a council member — whoever handles street lights.\n\nYou do not need an account here.\n"
   },
   "home": {
-    "title": "The Milky Way is still there. The streetlight is sitting on it.",
-    "body": "\nA bare lamp throws a pale dome over the roofs. A shade, a 3000K bulb, and a little less after midnight — the road stays, the sky comes back.\n\n## The phone on your pillow\n\nIt's late. The room is dark except the phone — a cool flood on the pillow, the ceiling, your face. The window goes blank. Slide it to red. Night vision stays. A few stars come back in the glass.\n\n## The lamp with no shade\n\nMidnight on your block. A tall street lamp without a shade throws light up and out. The sidewalk is bright. The Milky Way is gone. Shade it, warm it, dim it after midnight. The road stays.\n\n## Three things before bed\n\nRed on the phone. A warmer porch bulb. A headlamp that does not shout. Small light, aimed where you walk.\n"
+    "title": "The night sky is disappearing — and so is our health.",
+    "body": "\nWorld Without Light Pollution explains lumens, brightness, and how night lighting affects sleep and health — plus what you can do on your street and in your town.\n\n## The phone on your pillow\n\nIt's late. The room is dark except the phone — a cool flood on the pillow, the ceiling, your face. The window goes blank. Slide it to red. Night vision stays. A few stars come back in the glass.\n\n## The lamp with no shade\n\nMidnight on your block. A tall street lamp without a shade throws light up and out. The sidewalk is bright. The Milky Way is gone. Shade it, warm it, dim it after midnight. The road stays.\n\n## Three things before bed\n\nRed on the phone. A warmer porch bulb. A headlamp that does not shout. Small light, aimed where you walk.\n"
   },
   "impacts": {
     "title": "What good night light makes possible",
