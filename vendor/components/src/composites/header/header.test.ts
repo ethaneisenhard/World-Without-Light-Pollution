@@ -16,6 +16,8 @@ describe("renderHeader", () => {
     expect(html).toContain("<details");
     expect(html).toContain('aria-label="Toggle navigation menu"');
     expect(html).toContain("group/menu");
+    expect(html).toContain("contents md:hidden");
+    expect(html).toContain("hidden border-t border-line bg-paper shadow-md group-open/menu:block");
     expect(html).toContain("md:hidden");
     expect(html).toContain("hidden items-center gap-1 md:flex");
     expect(html).toContain("hidden items-center gap-2 md:flex");

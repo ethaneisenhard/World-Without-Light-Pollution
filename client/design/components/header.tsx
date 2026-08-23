@@ -109,7 +109,7 @@ export function Header(handle: Handle<HeaderHandleProps>) {
           ) : null}
 
           {nav || actions ? (
-            <details class="group/menu md:hidden">
+            <details class="group/menu contents md:hidden">
               <summary
                 class="list-none cursor-pointer select-none inline-flex size-10 items-center justify-center rounded-md text-ink-soft hover:bg-sand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent [&::-webkit-details-marker]:hidden"
                 aria-label="Toggle navigation menu"
@@ -121,7 +121,7 @@ export function Header(handle: Handle<HeaderHandleProps>) {
                   class: "hidden size-6 group-open/menu:block",
                 })}
               </summary>
-              <div class="absolute inset-x-0 top-full z-50 border-t border-line bg-paper shadow-md">
+              <div class="absolute inset-x-0 top-full z-50 hidden border-t border-line bg-paper shadow-md group-open/menu:block">
                 <nav
                   class="flex w-full flex-col gap-1 px-4 py-4"
                   aria-label="Mobile"

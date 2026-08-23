@@ -14,6 +14,8 @@ describe("mobile shell — homepage overflow sources", () => {
       'class="inline-flex max-w-full items-center gap-2.5 no-underline"',
     );
     expect(html).toContain("text-pretty");
+    expect(html).toContain("contents md:hidden");
+    expect(html).toContain("group-open/menu:block");
   });
 
   it("keeps the same header contract on a shared inner page", () => {
