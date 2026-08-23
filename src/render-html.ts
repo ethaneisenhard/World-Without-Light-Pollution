@@ -115,7 +115,7 @@ function navHtml(page: SitePageId): string {
       instanceId: "site-header",
     },
     slots: {
-      brand: `<a href="/" class="inline-flex items-center gap-2.5 no-underline"><span class="logo-globe shrink-0" data-as-logo-globe aria-hidden="true"></span><span class="font-display text-sm font-semibold tracking-tight text-ink md:text-base">${escapeHtml(SITE_BRAND.name)}</span></a>`,
+      brand: `<a href="/" class="inline-flex max-w-full items-center gap-2.5 no-underline"><span class="logo-globe shrink-0" data-as-logo-globe aria-hidden="true"></span><span class="font-display text-pretty text-sm font-semibold tracking-tight text-ink md:text-base">${escapeHtml(SITE_BRAND.name)}</span></a>`,
       nav: links,
       actions: themeToggle,
     },

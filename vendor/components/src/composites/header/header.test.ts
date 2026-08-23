@@ -25,6 +25,9 @@ describe("renderHeader", () => {
     expect(html).toContain('data-as-slot="actions"');
     expect(html).toContain('href="/about"');
     expect(html).toContain("border-b border-line");
+    expect(html).toContain("gap-3 px-4 py-4 md:gap-8");
+    expect(html).toContain('class="min-w-0"');
+    expect(html).not.toContain("min-w-0 shrink-0");
     expect(html).not.toContain(">Menu</summary>");
   });
 

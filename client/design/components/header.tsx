@@ -67,10 +67,10 @@ export function Header(handle: Handle<HeaderHandleProps>) {
 
     return (
       <header class={rootClass} {...rootAttrs}>
-        <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-8 px-4 py-4">
+        <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 md:gap-8">
           {brand ? (
             <div
-              class="min-w-0 shrink-0"
+              class="min-w-0"
               {...inspectSlotAttrs({
                 componentId: "header",
                 slot: "brand",

@@ -852,6 +852,7 @@
 
   [data-as-lumen-lab] {
     container-type: inline-size;
+    overflow-x: clip;
   }
   .nl-article-stack > .nl-kind {
     margin-top: 2.25rem;
@@ -895,6 +896,7 @@
     border-radius: 1rem;
     background: var(--color-paper-raised);
     color: var(--color-ink);
+    overflow-x: clip;
   }
   .nl-lab__tabs {
     display: flex;
@@ -941,7 +943,7 @@
   }
   .nl-lab__scene {
     position: relative;
-    overflow: visible;
+    overflow-x: clip;
   }
   .nl-lab__frame {
     border: 1px solid var(--color-line);
@@ -954,6 +956,7 @@
     width: 100%;
     height: auto;
     display: block;
+    overflow: hidden;
   }
   .nl-lab__marks {
     position: absolute;
@@ -1057,7 +1060,9 @@
     left: 0;
     top: calc(100% + 0.35rem);
     z-index: 4;
+    display: none;
     width: 13.5rem;
+    width: min(13.5rem, calc(100cqi - 1.25rem));
     padding: 0.55rem 0.7rem;
     border: 1px solid color-mix(in srgb, var(--color-on-hero) 22%, transparent);
     border-radius: 0.5rem;
@@ -1067,8 +1072,6 @@
     font-weight: 500;
     line-height: 1.4;
     white-space: normal;
-    opacity: 0;
-    visibility: hidden;
     pointer-events: none;
   }
   .nl-lab__mark--sky .nl-lab__tip,
@@ -1089,8 +1092,7 @@
   .nl-lab__mark:hover .nl-lab__tip,
   .nl-lab__mark:focus-within .nl-lab__tip,
   .nl-lab__mark.is-open .nl-lab__tip {
-    opacity: 1;
-    visibility: visible;
+    display: block;
   }
   .nl-lab__panel {
     display: flex;
@@ -1175,7 +1177,9 @@
     left: 0;
     top: calc(100% + 0.4rem);
     z-index: 5;
+    display: none;
     width: 14rem;
+    width: min(14rem, calc(100cqi - 1.25rem));
     padding: 0.55rem 0.7rem;
     border: 1px solid var(--color-line);
     border-radius: 0.5rem;
@@ -1184,14 +1188,11 @@
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.4;
-    opacity: 0;
-    visibility: hidden;
     pointer-events: none;
   }
   .nl-lab__info:hover .nl-lab__info-tip,
   .nl-lab__info:focus-within .nl-lab__info-tip {
-    opacity: 1;
-    visibility: visible;
+    display: block;
   }
   .nl-lab__range {
     width: 100%;

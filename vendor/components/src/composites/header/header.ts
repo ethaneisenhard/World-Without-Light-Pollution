@@ -93,7 +93,7 @@ export function renderHeader(
   });
 
   const brand = slots.brand?.trim()
-    ? `<div class="min-w-0 shrink-0" ${brandStamp}>${slots.brand}</div>`
+    ? `<div class="min-w-0" ${brandStamp}>${slots.brand}</div>`
     : "";
 
   const navInner = slots.nav?.trim() ?? "";
@@ -118,7 +118,7 @@ export function renderHeader(
       ? `<details class="group/menu md:hidden"><summary class="list-none cursor-pointer select-none inline-flex size-10 items-center justify-center rounded-md text-ink-soft hover:bg-sand focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent [&::-webkit-details-marker]:hidden" aria-label="Toggle navigation menu">${ICON_BARS}${ICON_X}</summary><div class="absolute inset-x-0 top-full z-50 border-t border-line bg-paper shadow-md"><nav class="flex w-full flex-col gap-1 px-4 py-4" aria-label="Mobile">${navInner}${mobileActions}</nav></div></details>`
       : "";
 
-  return `<header class="${escapeAttr(rootClass(props))}" ${stamp}><div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-8 px-4 py-4">${brand}${desktopNav}${desktopActions}${mobileMenu}</div></header>`;
+  return `<header class="${escapeAttr(rootClass(props))}" ${stamp}><div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 md:gap-8">${brand}${desktopNav}${desktopActions}${mobileMenu}</div></header>`;
 }
 
 export function Header(
