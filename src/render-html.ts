@@ -12,6 +12,7 @@ import {
   bodyAfterHeading,
   parseMarkdownFrontmatter,
   siteThemeBootInlineScript,
+  siteThemeDocumentAttrs,
   type AsThemeMode,
 } from "@glassbox-studio/studio-core/browser";
 import {
@@ -146,14 +147,15 @@ function footerHtml(): string {
 function shell(
   page: SitePageId,
   body: string,
-  theme: AsThemeMode = "light",
+  theme?: AsThemeMode,
   opts?: RenderDraftOpts,
 ): string {
   const title = pageTitle(page);
-  const darkClass = theme === "dark" ? "dark" : "";
+  const preference = theme ?? "system";
+  const attrs = siteThemeDocumentAttrs({ preference });
   const boot = siteThemeBootInlineScript({
     storageKey: "walp:color-mode",
-    defaultMode: theme,
+    defaultMode: preference,
     toggleSelector: "[data-as-theme-toggle]",
   });
   const strip = shouldStripAuthoringAttrs({
@@ -171,7 +173,7 @@ function shell(
     ? `<script src="/county-letter.js" defer></script>`
     : "";
   let html = `<!DOCTYPE html>
-<html lang="en" class="${darkClass}" data-theme="${theme}" style="color-scheme:${theme}">
+<html lang="en" class="${attrs.htmlClass}" data-theme="${attrs.dataTheme}" data-color-mode="${attrs.dataColorMode}" style="color-scheme:${attrs.colorScheme}">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -341,7 +343,7 @@ function contactBody(opts?: RenderDraftOpts): string {
 }
 
 export function renderSitePage(page: SitePageId, opts?: RenderDraftOpts): string {
-  const theme = opts?.theme ?? "light";
+  const theme = opts?.theme;
   if (page === "home") return shell(page, homeBody(opts), theme, opts);
   if (page === "contact") return shell(page, contactBody(opts), theme, opts);
   if (page === "lumens") return shell(page, lumensBody(opts), theme, opts);

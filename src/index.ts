@@ -54,7 +54,7 @@ function renderFromRequest(request: Request): string | null {
   const page = matchSitePage(pathname);
   if (!page) return null;
   const theme =
-    parseAsThemeParam(new URLSearchParams(search).get("as-theme")) ?? "light";
+    parseAsThemeParam(new URLSearchParams(search).get("as-theme")) ?? undefined;
   const studioPreview =
     new URLSearchParams(search).get("as-preview") === "1";
   let hostname = "127.0.0.1";
@@ -240,7 +240,7 @@ export default {
       return new Response("Not found", { status: 404 });
     }
 
-    const theme = parseAsThemeParam(url.searchParams.get("as-theme")) ?? "light";
+    const theme = parseAsThemeParam(url.searchParams.get("as-theme")) ?? undefined;
     const studioPreview = url.searchParams.get("as-preview") === "1";
     return new Response(
       renderSitePage(page, {
